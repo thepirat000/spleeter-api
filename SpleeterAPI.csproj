@@ -13,6 +13,8 @@
     <Compile Remove="conda\**" />
     <Compile Remove="configs\**" />
     <Compile Remove="docker\**" />
+    <Compile Remove="docs\**" />
+    <Compile Remove="Documents\**" />
     <Compile Remove="images\**" />
     <Compile Remove="pretrained_models\**" />
     <Compile Remove="spleeter\**" />
@@ -20,6 +22,8 @@
     <Content Remove="conda\**" />
     <Content Remove="configs\**" />
     <Content Remove="docker\**" />
+    <Content Remove="docs\**" />
+    <Content Remove="Documents\**" />
     <Content Remove="images\**" />
     <Content Remove="pretrained_models\**" />
     <Content Remove="spleeter\**" />
@@ -27,6 +31,8 @@
     <EmbeddedResource Remove="conda\**" />
     <EmbeddedResource Remove="configs\**" />
     <EmbeddedResource Remove="docker\**" />
+    <EmbeddedResource Remove="docs\**" />
+    <EmbeddedResource Remove="Documents\**" />
     <EmbeddedResource Remove="images\**" />
     <EmbeddedResource Remove="pretrained_models\**" />
     <EmbeddedResource Remove="spleeter\**" />
@@ -34,6 +40,8 @@
     <None Remove="conda\**" />
     <None Remove="configs\**" />
     <None Remove="docker\**" />
+    <None Remove="docs\**" />
+    <None Remove="Documents\**" />
     <None Remove="images\**" />
     <None Remove="pretrained_models\**" />
     <None Remove="spleeter\**" />

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Audio Splitter API</title>
+
+		<meta name="robots" content="noindex, nofollow">
+		<meta name="googlebot" content="noindex, nofollow">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<script type="text/javascript" src="https://code.jquery.com/jquery-compat-git.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="splitter.css">
+		
+	</head>
+	<body>
+		<header>
+		</header>
+		
+		<div id="div-main" class="banner-message">
+		  <p style="font-size: x-large;">YouTube audio splitter</p>
+		  <span>Type</span>
+		  <select id='type' title="Type">
+			<option value='karaoke' selected>Karaoke</option>
+				<option value='2stems' selected>2 stems (Vocals + Accompaniment)</option>
+				<option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
+				<option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+		  </select>
+		  <br/> <br/>
+		  <div>
+			<span>URL or vid:</span>
+			<input type="text" id="url" value="" />
+			<button id="btn-split">Split</button>
+			<div class="loader" id="spinner" style="display:none;" ></div>
+			<p id="duration"></p>
+		  </div>
+		  <div id="work-log" class="worklog" style="display:none;">
+		   
+		  </div>
+		</div>
+		<br/>
+		<div class="banner-message">
+		  <div>
+			<span>Youtube search:</span>
+			<input type="search" id="search" name="search_query" value="" />
+			<button id="btn-search">Search</button>
+		  </div>
+		  
+		  <div id="search-results">
+
+		  </div>
+		</div>	
+		<br/><br/><br/>
+		<footer class="border-top footer text-muted">
+			<div class="container">
+				&copy; 2019 - ThePirat -
+			</div>
+		</footer>
+
+		<script type="text/javascript" src="splitter.js"></script>
+	
+		<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
+	</body>
+</html>
