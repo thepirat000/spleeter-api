@@ -1,0 +1,1 @@
+docker run --rm -v="c:\spleeter\output":/output -v="c:\spleeter\input":/input -v="c:\spleeter\model":/model -e MODEL_PATH=/model -p 5000:5000 -t -i thepirat.azurecr.io/spleeterapi:latest
