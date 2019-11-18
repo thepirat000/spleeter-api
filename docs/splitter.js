@@ -219,7 +219,11 @@ function split(vid, format) {
       	alert(data.error);
       } else {
       	console.log("Successful split " + data.fileId);
-    		window.open(split_api + "/d/" + format + "/" + vid);
+        let downloadUrl = split_api + "/d/" + format + "/" + vid;
+        if ($("#chk-hf").is(':checked')) {
+          downloadUrl += "?hf=true";
+        }
+		window.open(downloadUrl);
       }
     },
     error: function(jqXHR, textStatus, errorThrown) {
