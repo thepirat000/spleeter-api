@@ -3,8 +3,25 @@ var buttonSearch = $("#btn-search");
 var max_duration_mins = 30;
 var split_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
 
-$(document).ready(function () {
+window.OnLoadCallback = () => {
+    let k = getCookie("spleeter_gapikey");
+    if (k) {
+        gapi.client.setApiKey(k);
+    } else {
+        k = prompt("Enter a valid Google API key for youtube v3 API. (go to console.developers.google.com to get an api key)");
+        if (k === null) {
+            return;
+        }
+        let dc = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", k).toString(CryptoJS.enc.Utf8);
+        if (dc.startsWith('AIza')) {
+            k = dc;
+        }
+        gapi.client.setApiKey(k);
+        setCookie("spleeter_gapikey", k);
+    }
+};
 
+$(document).ready(function () {
     let formatConfig = getCookie('spleeter_format');
     if (formatConfig) {
         $("#type").val(formatConfig);
@@ -29,7 +46,7 @@ $(document).ready(function () {
         split(vid, format);
     });
 
-    buttonSearch.on("click", function () {
+    buttonSearch.on("click", async function () {
         let q = $("#search").val();
         if (!q) {
             return;
@@ -39,17 +56,19 @@ $(document).ready(function () {
         }
         $(this).attr("disabled", true);
         $('#search-results').empty();
-        let restRequest = gapi.client.request({
-            'path': 'youtube/v3/search',
-            'params': {
-                'q': q,
-                'part': 'snippet',
-                'maxResults': 25,
-                'type': 'video'
-            }
-        });
-        restRequest.execute(function (resp) {
-            //$('#info').text(JSON.stringify(resp.items[0].id.videoId));
+
+        try {
+            let request = await gapi.client.request({
+                'path': 'youtube/v3/search',
+                'params': {
+                    'q': q,
+                    'part': 'snippet',
+                    'maxResults': 20,
+                    'type': 'video'
+                }
+            });
+            let resp = request.result;
+            // Handle response
             for (let i in resp.items) {
                 if (resp.items[i].id.videoId) {
                     $('<div/>', {
@@ -67,7 +86,15 @@ $(document).ready(function () {
                     //$('#search-results').append('<iframe width="105" height="79" src="//www.youtube.com/embed/'+ resp.items[i].id.videoId +'" frameborder="0" allowfullscreen></iframe>');    
                 }
             }
-        });
+        } catch (e) {
+            if (e.result.error.errors[0].reason === "keyInvalid") {
+                removeCookie("spleeter_gapikey");
+                alert("Invalid YouTube API key");
+                location.reload();
+            } else {
+                alert(e.result.error.errors[0].message);
+            }
+        }
         $(this).removeAttr("disabled");
     });
 
@@ -198,16 +225,16 @@ function stopWait() {
     $("#div-main").find("*").removeClass('wait');
 }
 
-window.OnLoadCallback = () => {
-    gapi.client.setApiKey('A' + 'Iza' + 'SyDuekF' + '_' + 'Hf7i2GqDZ' + '_' + '6ExQ1Iyfn_P_' + '-ACkg');
-};
-
 function setCookie(name, value, days) {
     return localStorage.setItem(name, value);
 }
 
 function getCookie(name) {
     return localStorage.getItem(name);
+}
+
+function removeCookie(name) {
+    localStorage.removeItem(name);
 }
 
 function split(vid, format) {
