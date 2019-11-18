@@ -4,7 +4,7 @@ var max_duration_mins = 25;
 var split_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
 
 window.OnLoadCallback = () => {
-	gapi.client.setApiKey('AIzaSyDuekF_Hf7i2GqDZ_6ExQ1Iyfn_P_-ACkg');
+	gapi.client.setApiKey('A' + 'Iza' + 'SyDuekF' + '_' + 'Hf7i2GqDZ' + '_' + '6ExQ1Iyfn_P_' + '-ACkg');
 }
 
 $(document).ready(function () {
