@@ -9,6 +9,13 @@ window.OnLoadCallback = () => {
 
 $(document).ready(function () {
 
+	let formatConfig = getCookie('spleeter_format');
+	if (formatConfig) {
+		$("#type").val(formatConfig);
+	}
+	let hfConfig = getCookie('spleeter_hf');
+	$("#chk-hf").prop('checked', hfConfig == 'true');
+
 	// handle click and add class
 	buttonSplit.on("click", function(){
 	  let vid = validateUrl();
@@ -18,6 +25,9 @@ $(document).ready(function () {
 	  }
 
 	  startWait();
+	  
+	  setCookie('spleeter_format', format, 30); 
+	  setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
 	  
 	  // Validate duration
 	  getYoutubeVideoDuration(vid, function(dur) {
@@ -200,6 +210,13 @@ function stopWait() {
   $("#btn-split").show();
 	$("#btn-split").removeAttr('disabled');
 	$("#div-main").find("*").removeClass('wait');
+}
+
+function setCookie(name,value,days) {
+    return localStorage.setItem(name, value);
+}
+function getCookie(name) {
+	return localStorage.getItem(name);
 }
 
 function split(vid, format) {
