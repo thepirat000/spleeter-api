@@ -6,15 +6,16 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DockerfileContext>.</DockerfileContext>
+    <DockerfileRunArguments>-v "C:/spleeter/output:/output" -v "C:/Spleeter/model":/model -e MODEL_PATH=/model</DockerfileRunArguments>
   </PropertyGroup>
 
+  
   <ItemGroup>
     <Compile Remove="alt-config\**" />
     <Compile Remove="API\**" />
     <Compile Remove="conda\**" />
     <Compile Remove="configs\**" />
     <Compile Remove="docker\**" />
-    <Compile Remove="docs\**" />
     <Compile Remove="Documents\**" />
     <Compile Remove="images\**" />
     <Compile Remove="nginx\**" />
@@ -25,7 +26,6 @@
     <Content Remove="conda\**" />
     <Content Remove="configs\**" />
     <Content Remove="docker\**" />
-    <Content Remove="docs\**" />
     <Content Remove="Documents\**" />
     <Content Remove="images\**" />
     <Content Remove="nginx\**" />
@@ -36,7 +36,6 @@
     <EmbeddedResource Remove="conda\**" />
     <EmbeddedResource Remove="configs\**" />
     <EmbeddedResource Remove="docker\**" />
-    <EmbeddedResource Remove="docs\**" />
     <EmbeddedResource Remove="Documents\**" />
     <EmbeddedResource Remove="images\**" />
     <EmbeddedResource Remove="nginx\**" />
@@ -47,7 +46,6 @@
     <None Remove="conda\**" />
     <None Remove="configs\**" />
     <None Remove="docker\**" />
-    <None Remove="docs\**" />
     <None Remove="Documents\**" />
     <None Remove="images\**" />
     <None Remove="nginx\**" />

@@ -13,6 +13,7 @@ namespace SpleeterAPI.Controllers
     {
         private readonly ILogger<YoutubeController> _logger;
         private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
+        private static int Max_Duration_Seconds = int.Parse(Startup.Configuration["Youtube:MaxDuration"]);
 
         public YoutubeController(ILogger<YoutubeController> logger)
         {
@@ -32,7 +33,18 @@ namespace SpleeterAPI.Controllers
             {
                 return BadRequest("Format must be '2stems', '4stems' or '5stems'");
             }
-            var fileId = GetFileId(format, vid, hf);
+
+            var info = YoutubeHelper.GetVideoInfo(vid);
+            if (info.DurationSeconds == 0)
+            {
+                return new YoutubeProcessResponse() { Error = $"Cannot process live videos" };
+            }
+            if (info.DurationSeconds > Max_Duration_Seconds)
+            {
+                return new YoutubeProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
+            }
+
+            var fileId = GetFileId(info.Title, format, vid, hf);
             var now = DateTime.UtcNow;
 
             if (_processing.TryGetValue(fileId, out DateTime startDate))
@@ -64,7 +76,7 @@ namespace SpleeterAPI.Controllers
             var audioData = YoutubeHelper.DownloadAudio(vid, fileId);
 
             // Separate audio stems
-            var separateResult = SpliterHelper.Split(audioData.AudioFileFullPath, fileId, format, hf);
+            var separateResult = SpliterHelper.Split(audioData.AudioFileFullPath, fileId, format, hf, _logger);
 
             if (separateResult.ExitCode != 0)
             {
@@ -79,7 +91,7 @@ namespace SpleeterAPI.Controllers
 
             if (format == "karaoke")
             {
-                System.IO.File.Copy($"/output/{fileId}/download.audio/accompaniment.mp3", $"/output/{fileId}.mp3");
+                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp3");
             }
             else
             {
@@ -88,7 +100,6 @@ namespace SpleeterAPI.Controllers
             }
 
             // Delete temp files
-            System.IO.File.Delete(audioData.AudioFileFullPath);
             System.IO.Directory.Delete($"/output/{fileId}", true);
 
             _processing.TryRemove(fileId, out _);
@@ -104,7 +115,8 @@ namespace SpleeterAPI.Controllers
         [HttpGet("d/{format}/{vid}")]
         public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
-            var fileId = GetFileId(format, vid, hf);
+            var info = YoutubeHelper.GetVideoInfo(vid);
+            var fileId = GetFileId(info.Title, format, vid, hf);
             if (format == "karaoke")
             {
                 var mp3File = $"/output/{fileId}.mp3";
@@ -130,7 +142,8 @@ namespace SpleeterAPI.Controllers
         [Produces("application/json")]
         public ActionResult<YoutubeStatusResponse> Query([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
-            var fileId = GetFileId(format, vid, hf);
+            var info = YoutubeHelper.GetVideoInfo(vid);
+            var fileId = GetFileId(info.Title, format, vid, hf);
             var result = new YoutubeStatusResponse() { FileId = fileId };
             if (_processing.TryGetValue(fileId, out DateTime startDate))
             {
@@ -167,9 +180,9 @@ namespace SpleeterAPI.Controllers
             return result;
         }
 
-        private string GetFileId(string format, string vid, bool includeHighFreq)
+        private string GetFileId(string title, string format, string vid, bool includeHighFreq)
         {
-            var fileId = $"{vid}.{format}";
+            var fileId = $"{title}-{vid}.{format}";
             if (includeHighFreq)
             {
                 fileId += ".hf";
