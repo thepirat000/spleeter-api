@@ -205,6 +205,9 @@ function stopWait() {
 function split(vid, format) {
   // WORK !
   var processUrl = split_api + "/p/" + format + "/" + vid + "?includeOriginalAudio=true";
+  if ($("#chk-hf").is(':checked')) {
+  	processUrl += "&hf=true";
+  }
   $("#btn-split").blur();
     
   $.ajax({

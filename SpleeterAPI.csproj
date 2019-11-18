@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="alt-config\**" />
     <Compile Remove="API\**" />
     <Compile Remove="conda\**" />
     <Compile Remove="configs\**" />
@@ -16,8 +17,10 @@
     <Compile Remove="docs\**" />
     <Compile Remove="Documents\**" />
     <Compile Remove="images\**" />
+    <Compile Remove="nginx\**" />
     <Compile Remove="pretrained_models\**" />
     <Compile Remove="spleeter\**" />
+    <Content Remove="alt-config\**" />
     <Content Remove="API\**" />
     <Content Remove="conda\**" />
     <Content Remove="configs\**" />
@@ -25,8 +28,10 @@
     <Content Remove="docs\**" />
     <Content Remove="Documents\**" />
     <Content Remove="images\**" />
+    <Content Remove="nginx\**" />
     <Content Remove="pretrained_models\**" />
     <Content Remove="spleeter\**" />
+    <EmbeddedResource Remove="alt-config\**" />
     <EmbeddedResource Remove="API\**" />
     <EmbeddedResource Remove="conda\**" />
     <EmbeddedResource Remove="configs\**" />
@@ -34,8 +39,10 @@
     <EmbeddedResource Remove="docs\**" />
     <EmbeddedResource Remove="Documents\**" />
     <EmbeddedResource Remove="images\**" />
+    <EmbeddedResource Remove="nginx\**" />
     <EmbeddedResource Remove="pretrained_models\**" />
     <EmbeddedResource Remove="spleeter\**" />
+    <None Remove="alt-config\**" />
     <None Remove="API\**" />
     <None Remove="conda\**" />
     <None Remove="configs\**" />
@@ -43,6 +50,7 @@
     <None Remove="docs\**" />
     <None Remove="Documents\**" />
     <None Remove="images\**" />
+    <None Remove="nginx\**" />
     <None Remove="pretrained_models\**" />
     <None Remove="spleeter\**" />
   </ItemGroup>
