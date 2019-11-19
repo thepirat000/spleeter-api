@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,6 +35,7 @@ namespace SpleeterAPI.Controllers
                 return BadRequest("Format must be '2stems', '4stems' or '5stems'");
             }
 
+            // Get video title and duration
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds == 0)
             {
@@ -44,18 +46,19 @@ namespace SpleeterAPI.Controllers
                 return new YoutubeProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
             }
 
-            var fileId = GetFileId(info.Title, format, vid, hf);
+            // Set the file name
+            var fileId = GetFileId(info.Filename, format, vid, hf);
             var now = DateTime.UtcNow;
 
+            // Check cache
             if (_processing.TryGetValue(fileId, out DateTime startDate))
             {
                 var startedSecondsAgo = (now - startDate).TotalSeconds;
-                if (startedSecondsAgo < 600)
+                if (startedSecondsAgo < 1800)
                 {
                     return new YoutubeProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
                 }
             }
-
             if (format == "karaoke")
             {
                 var mp3File = $"/output/{fileId}.mp3";
@@ -76,7 +79,9 @@ namespace SpleeterAPI.Controllers
             var audioData = YoutubeHelper.DownloadAudio(vid, fileId);
 
             // Separate audio stems
+            var sw = Stopwatch.StartNew();
             var separateResult = SpliterHelper.Split(audioData.AudioFileFullPath, fileId, format, hf, _logger);
+            _logger.LogInformation($"Separation for {fileId}:\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
 
             if (separateResult.ExitCode != 0)
             {
@@ -116,7 +121,7 @@ namespace SpleeterAPI.Controllers
         public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Title, format, vid, hf);
+            var fileId = GetFileId(info.Filename, format, vid, hf);
             if (format == "karaoke")
             {
                 var mp3File = $"/output/{fileId}.mp3";
@@ -143,7 +148,7 @@ namespace SpleeterAPI.Controllers
         public ActionResult<YoutubeStatusResponse> Query([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Title, format, vid, hf);
+            var fileId = GetFileId(info.Filename, format, vid, hf);
             var result = new YoutubeStatusResponse() { FileId = fileId };
             if (_processing.TryGetValue(fileId, out DateTime startDate))
             {

@@ -38,14 +38,15 @@ button {
 }
 
 .footer {
-  background: #27333B;
-  border-radius: 4px;
-  padding: 20px;
-  font-size: xx-small;
-  text-align: center;
-  transition: all 0.2s;
-  margin: 0 auto;
+    background: #6D7B84;
+    border-radius: 4px;
+    padding: 20px;
+    font-size: xx-small;
+    text-align: center;
+    transition: all 0.2s;
+    margin: 0 auto;
 }
+
 
 .loader {
   display: block;

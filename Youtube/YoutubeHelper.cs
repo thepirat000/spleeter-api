@@ -4,13 +4,6 @@ using System.IO;
 
 namespace SpleeterAPI.Youtube
 {
-    public class YoutubeVideoInfo
-    {
-        public int DurationSeconds { get; set; }
-        public string Duration { get; set; }
-        public string Title { get; set; }
-    }
-
     public static class YoutubeHelper
     {
         private const string Max_Size = "100M";
@@ -24,7 +17,7 @@ namespace SpleeterAPI.Youtube
             {
                 return cachedInfo;
             }
-            var cmd = $"youtube-dl -s --get-title --get-duration {vid}";
+            var cmd = $"youtube-dl -s --get-filename --get-duration {vid}";
             var shellResult = ShellHelper.Bash(cmd);
             if (shellResult.ExitCode != 0)
             {
@@ -37,9 +30,13 @@ namespace SpleeterAPI.Youtube
             }
             var info = new YoutubeVideoInfo()
             {
-                Title = dataArray[0],
+                Filename = dataArray[0].Trim(), 
                 Duration = dataArray[1]
             };
+            if (info.Filename.Contains('.'))
+            {
+                info.Filename = info.Filename.Substring(0, info.Filename.LastIndexOf('.'));
+            }
             var dur = info.Duration.Split(':');
             if (dur.Length == 1)
             {

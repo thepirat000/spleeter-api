@@ -16,6 +16,7 @@ RUN apt-get install -y git
 RUN git clone https://github.com/deezer/spleeter
 
 WORKDIR /workspace/deezer/spleeter/
+
 RUN pip install --upgrade pip
 RUN pip install .
 
