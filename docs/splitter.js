@@ -9,7 +9,8 @@ window.OnLoadCallback = () => {
         gapi.client.setApiKey(k);
     } else {
         k = prompt("Enter a valid Google API key for youtube v3 API. (go to console.developers.google.com to get an api key)");
-        if (k === null) {
+        if (!k) {
+            $("#div-search").hide();
             return;
         }
         let dc = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", k).toString(CryptoJS.enc.Utf8);
@@ -19,6 +20,7 @@ window.OnLoadCallback = () => {
         gapi.client.setApiKey(k);
         setCookie("spleeter_gapikey", k);
     }
+    $("#div-search").show();
 };
 
 $(document).ready(function () {
@@ -28,24 +30,26 @@ $(document).ready(function () {
     }
     let hfConfig = getCookie('spleeter_hf');
     $("#chk-hf").prop('checked', hfConfig === 'true');
+    let oriConfig = getCookie('spleeter_ori');
+    $("#chk-o").prop('checked', oriConfig === 'true' || oriConfig === null);
 
-    // handle click and add class
+    // handle Split click 
     buttonSplit.on("click", function () {
         let vid = validateUrl();
         let format = $("#type").val();
         if (vid === null || format === null) {
             return;
         }
-
         startWait();
-
         setCookie('spleeter_format', format, 30);
         setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+        setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
 
         // Split !
         split(vid, format);
     });
 
+    // handle Search click 
     buttonSearch.on("click", async function () {
         let q = $("#search").val();
         if (!q) {
@@ -105,6 +109,7 @@ $(document).ready(function () {
         $(this).css("opacity", "1");
     });
 
+    // Handle click on video from search
     $(document).on('click', '.clickable', function () {
         let vid = $(this).attr('title');
         if (vid) {
@@ -178,29 +183,27 @@ function validateUrl() {
     return url;
 }
 
-function getYoutubeVideoDuration(vid, callback) {
-    let restRequest = gapi.client.request({
+async function getYoutubeVideoDuration(vid, callback) {
+    let request = await gapi.client.request({
         'path': 'youtube/v3/videos',
         'params': {
             'id': vid,
             'part': 'contentDetails'
         }
     });
-    restRequest.execute(function (resp) {
-        if (resp && resp.items && resp.items.length > 0 && resp.items[0].contentDetails) {
-            callback(YTDuration(resp.items[0].contentDetails.duration));
-        } else {
-            stopWait();
-            alert("Video ID not found. Reponse: " + JSON.stringify(resp));
-        }
-    });
-
+    let resp = request.result;
+    if (resp && resp.items && resp.items.length > 0 && resp.items[0].contentDetails) {
+        callback(YTDuration(resp.items[0].contentDetails.duration));
+    } else {
+        stopWait();
+        alert("Video ID not found. Reponse: " + JSON.stringify(resp));
+    }
 }
 
 function YTDuration(duration) {
     var match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
     match = match.slice(1).map(function (x) {
-        if (x !== null) {
+        if (x !== undefined && x !== null) {
             return x.replace(/\D/, '');
         }
     });
@@ -239,10 +242,8 @@ function removeCookie(name) {
 
 function split(vid, format) {
     // WORK !
-    var processUrl = split_api + "/p/" + format + "/" + vid + "?includeOriginalAudio=true";
-    if ($("#chk-hf").is(':checked')) {
-        processUrl += "&hf=true";
-    }
+    let queryString = "?includeOriginalAudio=" + $("#chk-o").is(':checked') + "&hf=" + $("#chk-hf").is(':checked');
+    let processUrl = split_api + "/p/" + format + "/" + vid + queryString;
     $("#btn-split").blur();
 
     $.ajax({
@@ -254,10 +255,7 @@ function split(vid, format) {
                 alert(data.error);
             } else {
                 console.log("Successful split " + data.fileId);
-                let downloadUrl = split_api + "/d/" + format + "/" + vid;
-                if ($("#chk-hf").is(':checked')) {
-                    downloadUrl += "?hf=true";
-                }
+                let downloadUrl = split_api + "/d/" + format + "/" + vid + queryString;
                 window.open(downloadUrl);
             }
         },

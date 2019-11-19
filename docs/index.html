@@ -1,7 +1,9 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YouTube audio splitter API</title>
     <meta name="robots" content="noindex, nofollow">
@@ -21,8 +23,9 @@
 		
         <div id="div-main" class="banner-message">
             <p style="font-size: x-large;">YouTube audio splitter</p>
-            <div>
-                <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf">Include High Frequencies</label>
+            <div style="font-size: small;">
+                <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o">Original Audio</label>
+                <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf">High Frequencies</label>
             </div>
             <br />
             <select id='type' title="Type">
@@ -44,7 +47,7 @@
             </div>
         </div>
 		<br/>
-		<div class="banner-message">
+		<div id="div-search" style="display:none;" class="banner-message">
 		  <div>
 			<span>Youtube search:</span>
 			<input type="search" id="search" name="search_query" value="" />

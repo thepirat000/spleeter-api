@@ -47,7 +47,7 @@ namespace SpleeterAPI.Controllers
             }
 
             // Set the file name
-            var fileId = GetFileId(info.Filename, format, vid, hf);
+            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
             var now = DateTime.UtcNow;
 
             // Check cache
@@ -118,10 +118,10 @@ namespace SpleeterAPI.Controllers
         /// <param name="vid">Youtube video ID</param>
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("d/{format}/{vid}")]
-        public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
+        public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
         {
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Filename, format, vid, hf);
+            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
             if (format == "karaoke")
             {
                 var mp3File = $"/output/{fileId}.mp3";
@@ -145,10 +145,10 @@ namespace SpleeterAPI.Controllers
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("q/{format}/{vid}")]
         [Produces("application/json")]
-        public ActionResult<YoutubeStatusResponse> Query([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
+        public ActionResult<YoutubeStatusResponse> Query([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
         {
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Filename, format, vid, hf);
+            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
             var result = new YoutubeStatusResponse() { FileId = fileId };
             if (_processing.TryGetValue(fileId, out DateTime startDate))
             {
@@ -185,12 +185,20 @@ namespace SpleeterAPI.Controllers
             return result;
         }
 
-        private string GetFileId(string title, string format, string vid, bool includeHighFreq)
+        private string GetFileId(string title, string format, bool includeOriginalAudio, bool includeHighFreq)
         {
-            var fileId = $"{title}-{vid}.{format}";
-            if (includeHighFreq)
+            var fileId = $"{title}.{format}";
+            if (includeOriginalAudio || includeHighFreq)
             {
-                fileId += ".hf";
+                fileId += ".";
+                if (includeHighFreq)
+                {
+                    fileId += "hf";
+                }
+                if (includeOriginalAudio)
+                {
+                    fileId += "o";
+                }
             }
             return fileId;
         }
