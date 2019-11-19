@@ -31,7 +31,7 @@ $(document).ready(function () {
     let hfConfig = getCookie('spleeter_hf');
     $("#chk-hf").prop('checked', hfConfig === 'true');
     let oriConfig = getCookie('spleeter_ori');
-    $("#chk-o").prop('checked', oriConfig === 'true' || oriConfig === null);
+    $("#chk-o").prop('checked', oriConfig === 'true');
 
     // handle Split click 
     buttonSplit.on("click", function () {
