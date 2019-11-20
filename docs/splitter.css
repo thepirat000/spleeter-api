@@ -16,6 +16,10 @@ body {
   font-size: x-small;
 }
 
+#wait-dialog {
+    text-align: center;
+}
+
 .banner-message {
   background: #fff;
   border-radius: 4px;
@@ -34,7 +38,21 @@ button {
   border-radius: 5px;
   padding: 8px 14px;
   font-size: 15px;
+  margin-top: 15px;
   color: #fff;
+}
+
+.dropzone-drop-area {
+    background-color: lightcyan;
+    border: dashed 3px grey;
+    box-sizing: border-box;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+.dropzone-drop-area:hover {
+    background-color: darkorange;
+    border: dashed 3px black;
 }
 
 .footer {

@@ -1,7 +1,11 @@
 var buttonSplit = $("#btn-split");
 var buttonSearch = $("#btn-search");
 var max_duration_mins = 30;
-var split_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
+var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
+var split_mp3_api = 'https://spleeter.eastus.cloudapp.azure.com/mp3'; //'https://localhost:44319/mp3'; // 'http://localhost:5000/mp3'; 
+var selectedFiles = [];
+var dropzone;
+var dzError = false;
 
 window.OnLoadCallback = () => {
     let k = getCookie("spleeter_gapikey");
@@ -24,6 +28,8 @@ window.OnLoadCallback = () => {
 };
 
 $(document).ready(function () {
+    setupDropFilesBox();
+
     let formatConfig = getCookie('spleeter_format');
     if (formatConfig) {
         $("#type").val(formatConfig);
@@ -32,6 +38,11 @@ $(document).ready(function () {
     $("#chk-hf").prop('checked', hfConfig === 'true');
     let oriConfig = getCookie('spleeter_ori');
     $("#chk-o").prop('checked', oriConfig === 'true');
+
+
+    $("#btn-close-wait").on("click", function () {
+        stopWait();
+    });
 
     // handle Split click 
     buttonSplit.on("click", function () {
@@ -102,10 +113,12 @@ $(document).ready(function () {
         $(this).removeAttr("disabled");
     });
 
-    $(document).on('mouseenter', '.clickable', function () {
+    $("#btn-file-split").on("click", onFileSplit);
+
+    $(document).on('mouseenter', '.clickable, .file-clickable', function () {
         $(this).css("opacity", ".5");
     });
-    $(document).on('mouseleave', '.clickable', function () {
+    $(document).on('mouseleave', '.clickable, .file-clickable', function () {
         $(this).css("opacity", "1");
     });
 
@@ -124,7 +137,6 @@ $(document).ready(function () {
                     $("#duration").css("color", "black");
                 }
             });
-
         }
     });
 
@@ -136,6 +148,7 @@ $(document).ready(function () {
             return false;
         }
     });
+
     $('#search').keypress(function (e) {
         var key = e.which;
         if (key === 13) // the enter key code
@@ -216,16 +229,29 @@ function YTDuration(duration) {
 
 function startWait() {
     $("#spinner").show();
+    $("div.dz-preview").css("z-index", "0");
+    $("#wait-dialog").modal({
+        escapeClose: false,
+        clickClose: false,
+        showClose: false,
+        fadeDuration: 100
+    });
+
+
     $("#btn-split").hide();
+    $("#btn-file-split").hide();
     $("#btn-split").attr('disabled', true);
     $("#div-main").find("*").addClass('wait');
 }
 
 function stopWait() {
+    $("div.dz-preview").css("z-index", "auto");
     $("#spinner").hide();
     $("#btn-split").show();
+    $("#btn-file-split").show();
     $("#btn-split").removeAttr('disabled');
     $("#div-main").find("*").removeClass('wait');
+    $.modal.close();
 }
 
 function setCookie(name, value, days) {
@@ -240,10 +266,71 @@ function removeCookie(name) {
     localStorage.removeItem(name);
 }
 
+function setupDropFilesBox() {
+    $("#uploader")
+        .addClass('dropzone');
+    dropzone = new Dropzone("#uploader", {
+        url: split_mp3_api + '/p',
+        paramName: "file",
+        maxFilesize: 12, // MB
+        maxFiles: 5,
+        timeout: 600000,
+        clickable: true,
+        acceptedFiles: ".mp3",
+        uploadMultiple: true,
+        createImageThumbnails: false,
+        parallelUploads: 5,
+        autoProcessQueue: false,
+        dictDefaultMessage: "Drop files or click here to upload .mp3 files to split",
+        successmultiple: onFileSplitCompleted,
+        errormultiple: function (f, errorMessage) {
+            if (!dzError) {
+                dzError = true;
+                stopWait();
+                alert("Some files cannot be processed:\n" + errorMessage);
+            }
+        }
+    });
+}
+
+// Send mp3 files to process
+function onFileSplit() {
+    if (dropzone.getQueuedFiles().length === 0) {
+        return;
+    }
+    let format = $("#type").val();
+    $("#file-format").val(format);
+    $("#file-ori").val($("#chk-o").is(':checked'));
+    $("#file-hf").val($("#chk-hf").is(':checked'));
+
+    startWait();
+    
+    setCookie('spleeter_format', format, 30);
+    setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+    setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
+
+    dzError = false;
+    dropzone.processQueue(); 
+}
+function onFileSplitCompleted(f, response) {
+    stopWait();
+    dropzone.removeAllFiles();
+    if (response.error) {
+        dzError = true;
+        alert(response.error);
+    } else {
+        // download file
+        console.log("Successful split " + response.fileId);
+        let downloadUrl = split_mp3_api + "/d?fn=" + encodeURIComponent(response.fileId);
+        window.open(downloadUrl);
+    }
+}
+
+// Send youtube video to process
 function split(vid, format) {
     // WORK !
     let queryString = "?includeOriginalAudio=" + $("#chk-o").is(':checked') + "&hf=" + $("#chk-hf").is(':checked');
-    let processUrl = split_api + "/p/" + format + "/" + vid + queryString;
+    let processUrl = split_yt_api + "/p/" + format + "/" + vid + queryString;
     $("#btn-split").blur();
 
     $.ajax({
@@ -255,7 +342,7 @@ function split(vid, format) {
                 alert(data.error);
             } else {
                 console.log("Successful split " + data.fileId);
-                let downloadUrl = split_api + "/d/" + format + "/" + vid + queryString;
+                let downloadUrl = split_yt_api + "/d/" + format + "/" + vid + queryString;
                 window.open(downloadUrl);
             }
         },
@@ -264,5 +351,4 @@ function split(vid, format) {
             alert("ERROR: " + JSON.stringify(jqXHR));
         }
     });
-
 }

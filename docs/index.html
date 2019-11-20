@@ -5,68 +5,97 @@
     <meta name="google" content="notranslate">
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YouTube audio splitter API</title>
+    <title>Audio splitter API</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <script type="text/javascript" src="https://code.jquery.com/jquery-compat-git.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="splitter.css">
 
+    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+    <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-compat-git.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+   
 </head>
-	<body>
-		<header>
-		</header>
-		
-        <div id="div-main" class="banner-message">
-            <p style="font-size: x-large;">YouTube audio splitter</p>
-            <div style="font-size: small;">
-                <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o">Original Audio</label>
-                <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf">High Frequencies</label>
-            </div>
-            <br />
-            <select id='type' title="Type">
-                <option value='karaoke' selected>Karaoke</option>
-                <option value='2stems' selected>2 stems (Vocals + Accompaniment)</option>
-                <option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
-                <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
-            </select>
-            <br /> <br />
-            <div>
-                <span>URL or vid:</span>
-                <input type="text" id="url" value="" />
-                <button id="btn-split">Split</button>
-                <div class="loader" id="spinner" style="display:none;"></div>
-                <p id="duration"></p>
-            </div>
-            <div id="work-log" class="worklog" style="display:none;">
+<body>
+    <header>
+    </header>
 
-            </div>
+    <div id="wait-dialog" class="modal">
+        <div class="loader" id="spinner" style="display:none;"></div>
+        <div>
+            Processing. Please wait a few minutes...
         </div>
-		<br/>
-		<div id="div-search" style="display:none;" class="banner-message">
-		  <div>
-			<span>Youtube search:</span>
-			<input type="search" id="search" name="search_query" value="" />
-			<button id="btn-search">Search</button>
-		  </div>
-		  
-		  <div id="search-results">
+        <button id="btn-close-wait">Close</button>
+    </div>
 
-		  </div>
-		</div>	
-		<br/><br/><br/>
-		<footer class="border-top footer text-muted">
-            <div class="container">
-                <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
-            </div>
-		</footer>
+    <div id="div-main" class="banner-message">
+        <p style="font-size: x-large;">YouTube audio splitter</p>
+        <div style="font-size: small;">
+            <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o" title="Check to include the original audio on the output">Original Audio</label>
+            <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">High Frequencies</label>
+        </div>
+        <br />
+        <select id='type' title="Type">
+            <option value='karaoke' selected>Karaoke</option>
+            <option value='2stems' selected>2 stems (Vocals + Accompaniment)</option>
+            <option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
+            <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+        </select>
+        <br /> <br />
+        <div>
+            <span>YouTube URL or video ID</span>
+            <input type="text" id="url" value="" />
+            <div><button id="btn-split">Split</button></div>
+            <p id="duration"></p>
+        </div>
+        <div id="work-log" class="worklog" style="display:none;">
 
-		<script type="text/javascript" src="splitter.js"></script>
-	
-		<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
-	</body>
+        </div>
+    </div>
+    <br />
+    <div id="div-search" style="display:none;" class="banner-message">
+        <div>
+            <span>Youtube search:</span>
+            <input type="search" id="search" name="search_query" value="" />
+            <button id="btn-search">Search</button>
+        </div>
+
+        <div id="search-results">
+
+        </div>
+    </div>
+
+    <br />
+
+    <div class="banner-message">
+        <p style="font-size: x-large;">mp3 audio splitter</p>
+        <div class="dropzone-container">
+            <form id="uploader" class="dropzone-drop-area">
+                <input type="hidden" name="includeHf" id="file-hf" />
+                <input type="hidden" name="includeOri" id="file-ori" />
+                <input type="hidden" name="format" id="file-format" />
+            </form>
+        </div>
+
+        <button id="btn-file-split">Split</button>
+    </div>
+
+    <br />
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
+        </div>
+    </footer>
+
+    <script type="text/javascript" src="splitter.js"></script>
+
+    <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
+</body>
 </html>

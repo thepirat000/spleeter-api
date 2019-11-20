@@ -6,7 +6,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DockerfileContext>.</DockerfileContext>
-    <DockerfileRunArguments>-v "C:/spleeter/output:/output" -v "C:/Spleeter/model":/model -e MODEL_PATH=/model</DockerfileRunArguments>
+    <DockerfileRunArguments>-v "C:/spleeter/input:/input" -v "C:/spleeter/output:/output" -v "C:/Spleeter/model":/model -e MODEL_PATH=/model</DockerfileRunArguments>
   </PropertyGroup>
 
   

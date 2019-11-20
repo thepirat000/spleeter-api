@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SpleeterAPI.Youtube;
 
 namespace SpleeterAPI.Controllers
 {
+
     [Route("yt")]
     [ApiController]
     public class YoutubeController : ControllerBase
@@ -28,7 +31,7 @@ namespace SpleeterAPI.Controllers
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("p/{format}/{vid}")]
         [Produces("application/json")]
-        public ActionResult<YoutubeProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
+        public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
         {
             if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke")
             {
@@ -39,11 +42,11 @@ namespace SpleeterAPI.Controllers
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds == 0)
             {
-                return new YoutubeProcessResponse() { Error = $"Cannot process live videos" };
+                return new ProcessResponse() { Error = $"Cannot process live videos" };
             }
             if (info.DurationSeconds > Max_Duration_Seconds)
             {
-                return new YoutubeProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
+                return new ProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
             }
 
             // Set the file name
@@ -56,7 +59,7 @@ namespace SpleeterAPI.Controllers
                 var startedSecondsAgo = (now - startDate).TotalSeconds;
                 if (startedSecondsAgo < 1800)
                 {
-                    return new YoutubeProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
+                    return new ProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
                 }
             }
             if (format == "karaoke")
@@ -64,13 +67,13 @@ namespace SpleeterAPI.Controllers
                 var mp3File = $"/output/{fileId}.mp3";
                 if (System.IO.File.Exists(mp3File))
                 {
-                    return new YoutubeProcessResponse() { FileId = fileId };
+                    return new ProcessResponse() { FileId = fileId };
                 }
             }
             var zipFile = $"/output/{fileId}.zip";
             if (System.IO.File.Exists(zipFile))
             {
-                return new YoutubeProcessResponse() { FileId = fileId };
+                return new ProcessResponse() { FileId = fileId };
             }
 
             _processing[fileId] = now;
@@ -109,7 +112,7 @@ namespace SpleeterAPI.Controllers
 
             _processing.TryRemove(fileId, out _);
 
-            return new YoutubeProcessResponse() { FileId = fileId };
+            return new ProcessResponse() { FileId = fileId };
         }
 
         /// <summary>

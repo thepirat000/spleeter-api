@@ -28,15 +28,7 @@ namespace SpleeterAPI
         public void ConfigureServices(IServiceCollection services)
         {
             // Do not use CORS, should be added by nginx proxy
-            /*services.AddCors(options =>
-            {
-                options.AddPolicy(MyAllowSpecificOrigins,
-                builder =>
-                {
-                    builder.AllowAnyOrigin();
-                });
-            });*/
-
+            //services.AddCors();
 
             services.AddControllers();
         }
@@ -55,7 +47,7 @@ namespace SpleeterAPI
             app.UseRouting();
 
             // Do not use CORS, should be added by nginx proxy
-            //app.UseCors(MyAllowSpecificOrigins);
+            //app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthorization();
 
