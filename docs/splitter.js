@@ -45,76 +45,11 @@ $(document).ready(function () {
         stopWait();
     });
 
-    // handle Split click 
-    buttonSplit.on("click", function () {
-        let vid = validateUrl();
-        let format = $("#type").val();
-        if (vid === null || format === null) {
-            return;
-        }
-        startWait();
-        setCookie('spleeter_format', format, 30);
-        setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
-        setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
-
-        // Split !
-        split(vid, format);
-    });
+    // handle Youtube/File Split click 
+    buttonSplit.on("click", onSplit);
 
     // handle Search click 
-    buttonSearch.on("click", async function () {
-        let q = $("#search").val();
-        if (!q) {
-            return;
-        }
-        if (q.length < 3) {
-            return;
-        }
-        $(this).attr("disabled", true);
-        $('#search-results').empty();
-
-        try {
-            let request = await gapi.client.request({
-                'path': 'youtube/v3/search',
-                'params': {
-                    'q': q,
-                    'part': 'snippet',
-                    'maxResults': 20,
-                    'type': 'video'
-                }
-            });
-            let resp = request.result;
-            // Handle response
-            for (let i in resp.items) {
-                if (resp.items[i].id.videoId) {
-                    $('<div/>', {
-                        id: 'result' + i,
-                        "class": 'clickable',
-                        title: resp.items[i].id.videoId
-                    }).appendTo('#search-results');
-                    $('<img/>', {
-                        style: 'vertical-align:middle',
-                        src: resp.items[i].snippet.thumbnails.default.url
-                    }).appendTo('#result' + i);
-                    $('<span/>', {
-                        html: resp.items[i].snippet.title
-                    }).appendTo('#result' + i);
-                    //$('#search-results').append('<iframe width="105" height="79" src="//www.youtube.com/embed/'+ resp.items[i].id.videoId +'" frameborder="0" allowfullscreen></iframe>');    
-                }
-            }
-        } catch (e) {
-            if (e.result.error.errors[0].reason === "keyInvalid") {
-                removeCookie("spleeter_gapikey");
-                alert("Invalid YouTube API key");
-                location.reload();
-            } else {
-                alert(e.result.error.errors[0].message);
-            }
-        }
-        $(this).removeAttr("disabled");
-    });
-
-    $("#btn-file-split").on("click", onFileSplit);
+    buttonSearch.on("click", onYoutubeSearch);
 
     $(document).on('mouseenter', '.clickable, .file-clickable', function () {
         $(this).css("opacity", ".5");
@@ -177,6 +112,58 @@ function makeTabs() {
         $(activeTab).fadeIn();
         return false;
     });
+}
+
+async function onYoutubeSearch() {
+    let q = $("#search").val();
+    if (!q) {
+        return;
+    }
+    if (q.length < 3) {
+        return;
+    }
+    $(this).attr("disabled", true);
+    $('#search-results').empty();
+
+    try {
+        let request = await gapi.client.request({
+            'path': 'youtube/v3/search',
+            'params': {
+                'q': q,
+                'part': 'snippet',
+                'maxResults': 20,
+                'type': 'video'
+            }
+        });
+        let resp = request.result;
+        // Handle response
+        for (let i in resp.items) {
+            if (resp.items[i].id.videoId) {
+                $('<div/>', {
+                    id: 'result' + i,
+                    "class": 'clickable',
+                    title: resp.items[i].id.videoId
+                }).appendTo('#search-results');
+                $('<img/>', {
+                    style: 'vertical-align:middle',
+                    src: resp.items[i].snippet.thumbnails.default.url
+                }).appendTo('#result' + i);
+                $('<span/>', {
+                    html: resp.items[i].snippet.title
+                }).appendTo('#result' + i);
+                //$('#search-results').append('<iframe width="105" height="79" src="//www.youtube.com/embed/'+ resp.items[i].id.videoId +'" frameborder="0" allowfullscreen></iframe>');    
+            }
+        }
+    } catch (e) {
+        if (e.result.error.errors[0].reason === "keyInvalid") {
+            removeCookie("spleeter_gapikey");
+            alert("Invalid YouTube API key");
+            location.reload();
+        } else {
+            alert(e.result.error.errors[0].message);
+        }
+    }
+    $(this).removeAttr("disabled");
 }
 
 function validateUrl() {
@@ -314,6 +301,15 @@ function setupDropFilesBox() {
     });
 }
 
+function onSplit() {
+    let isYoutube = $("#tab1").is(":visible");
+    if (isYoutube) {
+        onYoutubeSplit();
+    } else {
+        onFileSplit();
+    }
+}
+
 // Send mp3 files to process
 function onFileSplit() {
     if (dropzone.getQueuedFiles().length === 0) {
@@ -347,6 +343,20 @@ function onFileSplitCompleted(f, response) {
     }
 }
 
+function onYoutubeSplit() {
+    let vid = validateUrl();
+    let format = $("#type").val();
+    if (vid === null || format === null) {
+        return;
+    }
+    startWait();
+    setCookie('spleeter_format', format, 30);
+    setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+    setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
+
+    // Split !
+    split(vid, format);
+}
 // Send youtube video to process
 function split(vid, format) {
     let queryString = "?includeOriginalAudio=" + $("#chk-o").is(':checked') + "&hf=" + $("#chk-hf").is(':checked');

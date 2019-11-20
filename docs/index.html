@@ -26,7 +26,7 @@
 <body>
     <div id="big-one" style="max-width: 640px; margin: 0 auto;">
         <div style="font-size: large; color: #08E; text-align: center; padding: 0em;">
-            <p style="margin: 0 auto; margin-left: 10%;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p> 
+            <p style="margin: 0 auto; margin-left: 10%;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p>
         </div>
         <div class="banner-message">
             <span class="section-title">Options</span>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <br/>
+            <br />
             <span class="section-title">Mode</span>
             <select id='type' title="Type">
                 <option value='karaoke' selected>Karaoke</option>
@@ -70,15 +70,13 @@
                     <hr />
                     <div id="div-main" class="banner-message">
                         <div>
-                            <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center;" />
-                            <div><button id="btn-split">Split</button></div>
-                            <p id="duration"></p>
+                            <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center; width:100%;" />
                         </div>
+                        <div id="duration"></div>
                     </div>
                 </div>
 
                 <div id="tab2" class="tab-content">
-
                     <div class="banner-message">
                         <div class="dropzone-container">
                             <form id="uploader" class="dropzone-drop-area">
@@ -87,11 +85,13 @@
                                 <input type="hidden" name="format" id="file-format" />
                             </form>
                         </div>
-
-                        <button id="btn-file-split">Split</button>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div>
+            <div><button id="btn-split" class="split-button">Split</button></div>
         </div>
 
         <div id="wait-dialog" class="modal">

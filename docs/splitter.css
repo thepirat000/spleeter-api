@@ -24,15 +24,22 @@ body {
 .clickable {
   text-align: left;
 }
+
 button {
     background: #0084ff;
     border: none;
     border-radius: 5px;
     padding: 8px 14px;
-    font-size: 15px;
-    margin-top: 15px;
+    margin-top: 10px;
     color: #fff;
-    cursor: pointer
+    cursor: pointer;
+    font-size: large;
+}
+
+.split-button {
+    width: 100%;
+    height: 42px;
+    vertical-align: middle;
 }
 
 .dropzone-drop-area {
@@ -51,11 +58,11 @@ button {
 .footer {
     background: #6D7B84;
     border-radius: 4px;
-    padding: 20px;
+    padding: 10px;
     font-size: xx-small;
     text-align: center;
     transition: all 0.2s;
-    margin: 0 auto;
+    margin: 1em auto;
 }
 
 
@@ -86,7 +93,7 @@ button {
 
 .tabs {
     /*width: 600px;*/
-    margin: 1em auto;
+    margin: 1em auto 0em auto;
     background-color: #09F;
     border-radius: 5px 5px 5px 5px;
 }
