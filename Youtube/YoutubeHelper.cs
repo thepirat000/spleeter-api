@@ -6,7 +6,6 @@ namespace SpleeterAPI.Youtube
 {
     public static class YoutubeHelper
     {
-        private const string Max_Size = "100M";
         private static string Youtube_User = Startup.Configuration["Youtube:User"];
         private static string Youtube_Pass = Startup.Configuration["Youtube:Pass"];
         private static ConcurrentDictionary<string, YoutubeVideoInfo> _videoInfoCache = new ConcurrentDictionary<string, YoutubeVideoInfo>();
@@ -66,11 +65,11 @@ namespace SpleeterAPI.Youtube
             string cmd;
             if (string.IsNullOrWhiteSpace(Youtube_User))
             {
-                cmd = $"youtube-dl -f 'bestaudio[filesize<{Max_Size}]' --no-playlist -o '{fileName}' {vid}";
+                cmd = $"youtube-dl -f 'bestaudio' --no-playlist -o '{fileName}' {vid}";
             }
             else
             {
-                cmd = $"youtube-dl -f 'bestaudio[filesize<{Max_Size}]' --no-playlist -u {Youtube_User} -p {Youtube_Pass} -o '{fileName}' {vid}";
+                cmd = $"youtube-dl -f 'bestaudio' --no-playlist -u {Youtube_User} -p {Youtube_Pass} -o '{fileName}' {vid}";
             }
             var shellResult = ShellHelper.Bash(cmd);
             if (shellResult.ExitCode != 0)

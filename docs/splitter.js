@@ -1,7 +1,7 @@
 var buttonSplit = $("#btn-split");
 var buttonSearch = $("#btn-search");
 var max_duration_mins = 30;
-var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
+var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt'; //'https://localhost:44319/yt';
 var split_mp3_api = 'https://spleeter.eastus.cloudapp.azure.com/mp3'; //'https://localhost:44319/mp3'; // 'http://localhost:5000/mp3'; 
 var selectedFiles = [];
 var dropzone;
@@ -378,7 +378,7 @@ function split(vid, format) {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             stopWait();
-            alert("ERROR: " + JSON.stringify(jqXHR));
+            alert("ERROR processing " + vid + ": " + JSON.stringify(jqXHR));
         }
     });
 }
