@@ -131,6 +131,7 @@ $(document).ready(function () {
             $("#btn-split").focus();
             getYoutubeVideoDuration(vid, function (dur) {
                 $("#duration").text("Duration: " + dur);
+                $("#duration").show();
                 let durationInMinutes = parseInt(dur.split(':')[0]) * 60 + parseInt(dur.split(':')[1]);
                 if (durationInMinutes > max_duration_mins) {
                     $("#duration").css("color", "red");
@@ -270,6 +271,7 @@ function stopWait() {
     $("#btn-file-split").show();
     $("#btn-split").removeAttr('disabled');
     $("#div-main").find("*").removeClass('wait');
+    $("#duration").hide();
     $.modal.close();
 }
 

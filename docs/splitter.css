@@ -1,6 +1,5 @@
 body {
   background: #20262E;
-  padding: 20px;
   font-family: Helvetica;
 }
 
@@ -16,7 +15,7 @@ body {
 .banner-message {
   background: #fff;
   border-radius: 4px;
-  padding: 20px;
+  padding: 10px;
   font-size: 15px;
   text-align: center;
   transition: all 0.2s;
