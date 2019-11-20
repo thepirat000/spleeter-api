@@ -28,6 +28,7 @@ window.OnLoadCallback = () => {
 };
 
 $(document).ready(function () {
+    makeTabs();
     setupDropFilesBox();
 
     let formatConfig = getCookie('spleeter_format');
@@ -159,6 +160,24 @@ $(document).ready(function () {
     });
 });
 
+function makeTabs() {
+    // Show the first tab and hide the rest
+    $('#tabs-nav li:first-child').addClass('active');
+    $('.tab-content').hide();
+    $('.tab-content:first').show();
+
+    // Click function
+    $('#tabs-nav li').click(function () {
+        $('#tabs-nav li').removeClass('active');
+        $(this).addClass('active');
+        $('.tab-content').hide();
+
+        var activeTab = $(this).find('a').attr('href');
+        $(activeTab).fadeIn();
+        return false;
+    });
+}
+
 function validateUrl() {
     let url = $("#url").val();
     if (url.length === 0) {
@@ -281,7 +300,7 @@ function setupDropFilesBox() {
         createImageThumbnails: false,
         parallelUploads: 5,
         autoProcessQueue: false,
-        dictDefaultMessage: "Drop files or click here to upload .mp3 files to split",
+        dictDefaultMessage: "Drop .mp3 files or click to upload files to split",
         successmultiple: onFileSplitCompleted,
         errormultiple: function (f, errorMessage) {
             if (!dzError) {
@@ -328,7 +347,6 @@ function onFileSplitCompleted(f, response) {
 
 // Send youtube video to process
 function split(vid, format) {
-    // WORK !
     let queryString = "?includeOriginalAudio=" + $("#chk-o").is(':checked') + "&hf=" + $("#chk-hf").is(':checked');
     let processUrl = split_yt_api + "/p/" + format + "/" + vid + queryString;
     $("#btn-split").blur();
