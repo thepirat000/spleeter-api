@@ -26,13 +26,14 @@ body {
   text-align: left;
 }
 button {
-  background: #0084ff;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 14px;
-  font-size: 15px;
-  margin-top: 15px;
-  color: #fff;
+    background: #0084ff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 14px;
+    font-size: 15px;
+    margin-top: 15px;
+    color: #fff;
+    cursor: pointer
 }
 
 .dropzone-drop-area {

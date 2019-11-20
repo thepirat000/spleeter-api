@@ -5,7 +5,7 @@
     <meta name="google" content="notranslate">
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Audio splitter API</title>
+    <title>Audio Splitter</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -27,90 +27,98 @@
     <header>
     </header>
 
-    <div class="banner-message">
-        <span class="section-title">Options</span>
-        <div style="border:1px solid #ccc;">
-            <div style="font-size: small;">
-                <div>
-                    <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o" title="Check to include the original audio on the output">Original Audio</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">High Frequencies</label>
-                </div>
-            </div>
+    <div id="big-one" style="max-width: 640px; margin: 0 auto;">
+
+        <div style="font-size: large; color: #08E; text-align: center; padding: .001em;">
+            <p style="margin-left: 164px;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p> 
         </div>
-        <br />
-        <span class="section-title">Mode</span>
-        <select id='type' title="Type">
-            <option value='karaoke' selected>Karaoke</option>
-            <option value='2stems' selected>2 stems (Vocals + Accompaniment)</option>
-            <option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
-            <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
-        </select>
-    </div>
 
-    <div class="tabs">
-        <ul id="tabs-nav">
-            <li><a href="#tab1">YouTube</a></li>
-            <li><a href="#tab2">File</a></li>
-        </ul>
-
-        <div id="tabs-content">
-            <div id="tab1" class="tab-content">
-                <div id="div-main" class="banner-message">
+        <div class="banner-message">
+            <span class="section-title">Options</span>
+            <div style="border:1px solid #ccc;">
+                <div style="font-size: small;">
                     <div>
-                        <div>URL or video ID</div>
-                        <input type="text" id="url" value="" style="min-width: 240px; text-align: center;" />
-                        <div><button id="btn-split">Split</button></div>
-                        <p id="duration"></p>
+                        <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o" title="Check to include the original audio on the output">Include original audio</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
                     </div>
                 </div>
-                <hr/>
-                <div id="div-search" style="display:none;" class="banner-message">
-                    <div>
-                        <div>Youtube search</div>
-                        <input type="search" id="search" name="search_query" value="" style="min-width: 240px; text-align: center;" />
+            </div>
+            <br />
+            <span class="section-title">Mode</span>
+            <select id='type' title="Type">
+                <option value='karaoke' selected>Karaoke</option>
+                <option value='2stems' selected>2 stems (Vocals + Accompaniment)</option>
+                <option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
+                <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+            </select>
+        </div>
+
+        <div class="tabs">
+            <ul id="tabs-nav">
+                <li><a href="#tab1">YouTube</a></li>
+                <li><a href="#tab2">File</a></li>
+            </ul>
+
+            <div id="tabs-content">
+                <div id="tab1" class="tab-content">
+                    <div id="div-main" class="banner-message">
                         <div>
-                            <button id="btn-search">Search</button>
+                            <div>URL or video ID</div>
+                            <input type="text" id="url" value="" style="min-width: 240px; text-align: center;" />
+                            <div><button id="btn-split">Split</button></div>
+                            <p id="duration"></p>
                         </div>
                     </div>
+                    <hr />
+                    <div id="div-search" style="display:none;" class="banner-message">
+                        <div>
+                            <div>Youtube search</div>
+                            <input type="search" id="search" name="search_query" value="" style="min-width: 240px; text-align: center;" />
+                            <div>
+                                <button id="btn-search">Search</button>
+                            </div>
+                        </div>
 
-                    <div id="search-results">
+                        <div id="search-results">
 
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab2" class="tab-content">
+
+                    <div class="banner-message">
+                        <div class="dropzone-container">
+                            <form id="uploader" class="dropzone-drop-area">
+                                <input type="hidden" name="includeHf" id="file-hf" />
+                                <input type="hidden" name="includeOri" id="file-ori" />
+                                <input type="hidden" name="format" id="file-format" />
+                            </form>
+                        </div>
+
+                        <button id="btn-file-split">Split</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div id="tab2" class="tab-content">
-
-                <div class="banner-message">
-                    <div class="dropzone-container">
-                        <form id="uploader" class="dropzone-drop-area">
-                            <input type="hidden" name="includeHf" id="file-hf" />
-                            <input type="hidden" name="includeOri" id="file-ori" />
-                            <input type="hidden" name="format" id="file-format" />
-                        </form>
-                    </div>
-
-                    <button id="btn-file-split">Split</button>
-                </div>
+        <div id="wait-dialog" class="modal">
+            <div class="loader" id="spinner" style="display:none;"></div>
+            <div>
+                Processing. Please wait a few minutes...
             </div>
+            <button id="btn-close-wait">Close</button>
         </div>
-    </div>
 
-    <div id="wait-dialog" class="modal">
-        <div class="loader" id="spinner" style="display:none;"></div>
-        <div>
-            Processing. Please wait a few minutes...
-        </div>
-        <button id="btn-close-wait">Close</button>
-    </div>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
+            </div>
+        </footer>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
-        </div>
-    </footer>
+    </div>
 
     <script type="text/javascript" src="splitter.js"></script>
 
