@@ -302,7 +302,7 @@ function setupDropFilesBox() {
         createImageThumbnails: false,
         parallelUploads: 5,
         autoProcessQueue: false,
-        dictDefaultMessage: "Drop .mp3 files or click to upload files to split",
+        dictDefaultMessage: "Drop .mp3 files or click to upload",
         successmultiple: onFileSplitCompleted,
         errormultiple: function (f, errorMessage) {
             if (!dzError) {

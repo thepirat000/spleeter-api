@@ -21,30 +21,26 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-   
-
     <div id="big-one" style="max-width: 640px; margin: 0 auto;">
-
         <div style="font-size: large; color: #08E; text-align: center; padding: 0em;">
             <p style="margin: 0 auto; margin-left: 10%;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p> 
         </div>
-
         <div class="banner-message">
             <span class="section-title">Options</span>
-            <div style="border:1px solid #ccc;">
+            <div id="options">
                 <div style="font-size: small;">
                     <div>
-                        <input type="checkbox" id="chk-o" value="o" checked="checked"> <label for="chk-o" title="Check to include the original audio on the output">Include original audio</label>
+                        <input style="margin-bottom: 10px;" type="checkbox" id="chk-o" value="o" checked="checked"> <label style="font-size: 17px;" for="chk-o" title="Check to include the original audio on the output">Include original audio</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
+                        <input type="checkbox" id="chk-hf" value="hf"> <label style="font-size: 17px;" for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
                     </div>
                 </div>
             </div>
-            <br />
+            <br/>
             <span class="section-title">Mode</span>
             <select id='type' title="Type">
                 <option value='karaoke' selected>Karaoke</option>
@@ -62,25 +58,21 @@
 
             <div id="tabs-content">
                 <div id="tab1" class="tab-content">
-                    <div id="div-main" class="banner-message">
-                        <div>
-                            <div>URL or video ID</div>
-                            <input type="text" id="url" value="" style="min-width: 240px; text-align: center;" />
-                            <div><button id="btn-split">Split</button></div>
-                            <p id="duration"></p>
-                        </div>
-                    </div>
-                    <hr />
                     <div id="div-search" style="display:none;" class="banner-message">
                         <div>
-                            <div>Youtube search</div>
-                            <input type="search" id="search" name="search_query" value="" style="min-width: 240px; text-align: center;" />
-                            <div>
-                                <button id="btn-search">Search</button>
-                            </div>
+                            <input id="search" class="search" autocapitalize="none" autocomplete="off" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
+                            <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
                         </div>
                         <div id="search-results">
 
+                        </div>
+                    </div>
+                    <hr />
+                    <div id="div-main" class="banner-message">
+                        <div>
+                            <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center;" />
+                            <div><button id="btn-split">Split</button></div>
+                            <p id="duration"></p>
                         </div>
                     </div>
                 </div>

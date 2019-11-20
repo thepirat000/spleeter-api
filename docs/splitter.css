@@ -138,4 +138,50 @@ ul#tabs-nav li.active {
 
 .section-title {
     font-weight: bold;
+    font-size: 18px;
+}
+
+.search {
+    padding: 10px 0px 10px 0px;
+    font-size: 17px;
+    border: 1px solid grey;
+    width: 80%;
+    background: #f1f1f1;
+    margin: 0 auto;
+}
+#btn-search {
+    margin: 0 auto;
+    max-width: 46px;
+    min-width: 16px;
+    width: 10%;
+    padding: 10px 0px 10px 0px;
+    background: #2196F3;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none; /* Prevent double borders */
+    cursor: pointer;
+}
+
+#btn-search:hover {
+    background: #0b7dda;
+}
+
+select {
+    margin: 0 auto;
+    width: 100%;
+    font-size: 16px;
+    border: 1px solid #CCC;
+    height: 34px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url(https://www.deezer.com/favicon.ico) 96% / 5% no-repeat #EEE;
+}
+
+#uploader, #options {
+    padding: 10px 0px 10px 0px;
+    font-size: 17px;
+    width: 80%;
+    background: #f1f1f1;
+    margin: 0 auto;
 }
