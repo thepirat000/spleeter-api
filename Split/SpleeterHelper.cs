@@ -27,7 +27,6 @@ namespace SpleeterAPI.Youtube
             var maxDurationParam = Max_Duration == "" ? "" : $"--max_duration {Max_Duration}";
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
             cmd = $"python -m spleeter separate {inputParam} -o \"/output/{outputFolder}\" {maxDurationParam} {formatParam} -c mp3";
-            log.LogInformation($"Will execute: {cmd}");
             var result = ShellHelper.Bash(cmd);
             return result;
         }

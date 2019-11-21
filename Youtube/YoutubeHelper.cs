@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 
@@ -34,7 +35,7 @@ namespace SpleeterAPI.Youtube
             };
             if (info.Filename.Contains('.'))
             {
-                info.Filename = info.Filename.Substring(0, info.Filename.LastIndexOf('.'));
+                info.Filename = ShellHelper.SanitizeFilename(info.Filename.Substring(0, info.Filename.LastIndexOf('.')));
             }
             var dur = info.Duration.Split(':');
             if (dur.Length == 1)
@@ -88,6 +89,7 @@ namespace SpleeterAPI.Youtube
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : $"-u '{Youtube_User}' -p '{Youtube_Pass}'";
             var cmd = $"youtube-dl -f 'bestvideo[height<=720][ext=mp4]' --max-filesize 50M {userPassParams} -o '{fileName}' {vid}";
+            
             var shellResult = ShellHelper.Bash(cmd);
             if (shellResult.ExitCode != 0)
             {

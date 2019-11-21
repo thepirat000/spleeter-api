@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace SpleeterAPI
 {
@@ -9,6 +10,7 @@ namespace SpleeterAPI
     {
         public static ShellExecutionResult Bash(string cmd)
         {
+            Console.WriteLine($"Will execute: {cmd}");
             var escapedArgs = cmd.Replace("\"", "\\\"");
             var outputBuilder = new StringBuilder();
             var process = new Process()
@@ -55,6 +57,11 @@ namespace SpleeterAPI
             };
         }
 
+        public static string SanitizeFilename(string filename)
+        {
+            filename = filename.Replace("/", "").Replace("\\", "").Replace("\"", "");
+            return string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
+        }
 
     }
 }

@@ -90,7 +90,7 @@ namespace SpleeterAPI.Controllers
             // 1. copy input files to a temp folder
             foreach (var file in Request.Form.Files)
             {
-                var fileName = SanitizeFilename(file.FileName);
+                var fileName = ShellHelper.SanitizeFilename(file.FileName);
                 inputFilenames.Add($"{fileName}");
                 var filePath = $"{inputFolder}/{fileName}";
                 if (!System.IO.File.Exists(filePath))
@@ -192,12 +192,6 @@ namespace SpleeterAPI.Controllers
                 }
             }
             return fileId;
-        }
-
-        private string SanitizeFilename(string filename)
-        {
-            filename = filename.Replace("/", "").Replace("\\", "").Replace("\"", "");
-            return string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
         }
 
     }

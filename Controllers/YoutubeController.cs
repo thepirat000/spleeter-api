@@ -199,7 +199,7 @@ namespace SpleeterAPI.Controllers
         private void MakeVideo(string vid, string audioFilepath, string outputFilepath)
         {
             var video = YoutubeHelper.DownloadVideo(vid);
-            var cmd = $"ffmpeg -i '{video.VideoFileFullPath}' -i '{audioFilepath}' -c:v copy -map 0:v:0 -map 1:a:0 '{outputFilepath}'";
+            var cmd = $"ffmpeg -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -map 0:v:0 -map 1:a:0 \"{outputFilepath}\"";
             var shellResult = ShellHelper.Bash(cmd);
             if (shellResult.ExitCode != 0)
             {
