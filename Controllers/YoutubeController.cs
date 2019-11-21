@@ -100,11 +100,18 @@ namespace SpleeterAPI.Controllers
             if (format == "karaoke")
             {
                 System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp3");
+                // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
+                ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile.Replace(".karaoke", ".2stems"), CompressionLevel.Fastest, false);
             }
             else
             {
                 // Zip stems
                 ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile, CompressionLevel.Fastest, false);
+                if (format == "2stems")
+                {
+                    // Also copy the karaoke mp3 to the output, to avoid processing again if karaoke is requested
+                    System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".2stems", ".karaoke")}.mp3");
+                }
             }
 
             // Delete temp files
