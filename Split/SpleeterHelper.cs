@@ -9,7 +9,7 @@ namespace SpleeterAPI.Youtube
 
         public static ShellExecutionResult Split(string inputFile, string fileId, string format, bool includeHighFreq, ILogger log, bool isBatch = false)
         {
-            if (format == "karaoke")
+            if (format == "karaoke" || format == "vocals")
             {
                 format = "2stems";
             }

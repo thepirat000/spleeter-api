@@ -34,7 +34,7 @@ namespace SpleeterAPI.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<ProcessResponse>> Process([FromForm] string format, [FromForm] bool includeHf)
         {
-            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke")
+            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
             {
                 return BadRequest("Format must be '2stems', '4stems' or '5stems'");
             }
@@ -60,7 +60,7 @@ namespace SpleeterAPI.Controllers
                 }
             }
 
-            if (format == "karaoke")
+            if (format == "karaoke" || format == "vocals")
             {
                 if (Request.Form.Files.Count == 1)
                 {
@@ -120,12 +120,13 @@ namespace SpleeterAPI.Controllers
             }
 
             // 2.1 If karaoke
-            if (format == "karaoke")
+            if (format == "karaoke" || format == "vocals")
             {
                 // 2.1.1 If just 1 file -> copy to output renaming as karaoke and return mp3 file name
                 if (inputFilenames.Count == 1)
                 {
-                    System.IO.File.Copy($"/output/{archiveName}/{Path.GetFileNameWithoutExtension(inputFilenames[0])}/accompaniment.mp3", $"/output/{archiveName}.mp3");
+                    var fileToCopy = format == "karaoke" ? "accompaniment.mp3" : "vocals.mp3";
+                    System.IO.File.Copy($"/output/{archiveName}/{Path.GetFileNameWithoutExtension(inputFilenames[0])}/{fileToCopy}", $"/output/{archiveName}.mp3", true);
                     Directory.Delete($"/output/{archiveName}", true);
                     Directory.Delete(inputFolder, true);
                     _processing.TryRemove(archiveName, out _);
@@ -134,7 +135,8 @@ namespace SpleeterAPI.Controllers
                 else
                 {
                     // More than 1 karaoke -> remove all the vocals.mp3
-                    foreach (var file in Directory.EnumerateFiles($"/output/{archiveName}", "vocals.mp3", SearchOption.AllDirectories))
+                    var fileToRemove = format == "karaoke" ? "vocals.mp3" : "accompaniment.mp3";
+                    foreach (var file in Directory.EnumerateFiles($"/output/{archiveName}", fileToRemove, SearchOption.AllDirectories))
                     {
                         System.IO.File.Delete(file);
                     }

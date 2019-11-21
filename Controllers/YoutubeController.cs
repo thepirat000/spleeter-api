@@ -33,7 +33,7 @@ namespace SpleeterAPI.Controllers
         [Produces("application/json")]
         public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
         {
-            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke")
+            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
             {
                 return BadRequest("Format must be '2stems', '4stems' or '5stems'");
             }
@@ -62,7 +62,8 @@ namespace SpleeterAPI.Controllers
                     return new ProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
                 }
             }
-            if (format == "karaoke")
+            var zipFile = $"/output/{fileId}.zip";
+            if (format == "karaoke" || format == "vocals")
             {
                 var mp3File = $"/output/{fileId}.mp3";
                 if (System.IO.File.Exists(mp3File))
@@ -70,10 +71,12 @@ namespace SpleeterAPI.Controllers
                     return new ProcessResponse() { FileId = fileId };
                 }
             }
-            var zipFile = $"/output/{fileId}.zip";
-            if (System.IO.File.Exists(zipFile))
+            else
             {
-                return new ProcessResponse() { FileId = fileId };
+                if (System.IO.File.Exists(zipFile))
+                {
+                    return new ProcessResponse() { FileId = fileId };
+                }
             }
 
             _processing[fileId] = now;
@@ -92,25 +95,47 @@ namespace SpleeterAPI.Controllers
                 return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nException: {separateResult.Exception}\nMessages: {separateResult.Output}.");
             }
 
-            if (format != "karaoke" && includeOriginalAudio)
+            if ((format != "karaoke" && format != "vocals") && includeOriginalAudio)
             {
-                System.IO.File.Copy(audioData.AudioFileFullPath, $"/output/{fileId}/original.webm");
+                System.IO.File.Copy(audioData.AudioFileFullPath, $"/output/{fileId}/original.webm", true);
             }
 
             if (format == "karaoke")
             {
-                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp3");
+                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp3", true);
+                // Also copy the vocals
+                System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId.Replace(".karaoke", ".vocals")}.mp3", true);
                 // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
-                ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile.Replace(".karaoke", ".2stems"), CompressionLevel.Fastest, false);
+                var zipFile2stems = zipFile.Replace(".karaoke", ".2stems");
+                if (!System.IO.File.Exists(zipFile2stems))
+                {
+                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                }
+            }
+            else if (format == "vocals")
+            {
+                System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId}.mp3", true);
+                // Also copy the karaoke
+                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".vocals", ".karaoke")}.mp3", true);
+                // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
+                var zipFile2stems = zipFile.Replace(".vocals", ".2stems");
+                if (!System.IO.File.Exists(zipFile2stems))
+                {
+                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                }
             }
             else
             {
                 // Zip stems
-                ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile, CompressionLevel.Fastest, false);
+                if (!System.IO.File.Exists(zipFile))
+                {
+                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile, CompressionLevel.Fastest, false);
+                }
                 if (format == "2stems")
                 {
-                    // Also copy the karaoke mp3 to the output, to avoid processing again if karaoke is requested
-                    System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".2stems", ".karaoke")}.mp3");
+                    // Also copy the karaoke & vocals mp3s to the output, to avoid processing again 
+                    System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".2stems", ".karaoke")}.mp3", true);
+                    System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId.Replace(".2stems", ".vocals")}.mp3", true);
                 }
             }
 
@@ -132,7 +157,7 @@ namespace SpleeterAPI.Controllers
         {
             var info = YoutubeHelper.GetVideoInfo(vid);
             var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
-            if (format == "karaoke")
+            if (format == "karaoke" || format == "vocals")
             {
                 var mp3File = $"/output/{fileId}.mp3";
                 if (System.IO.File.Exists(mp3File))
@@ -164,7 +189,7 @@ namespace SpleeterAPI.Controllers
             {
                 result.StartDate = startDate;
             }
-            if (format == "karaoke")
+            if (format == "karaoke" || format == "vocals")
             {
                 var mp3File = $"/output/{fileId}.mp3";
                 if (System.IO.File.Exists(mp3File))
