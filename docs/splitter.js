@@ -9,10 +9,17 @@ var dzError = false;
 
 window.OnLoadCallback = () => {
     let k = getCookie("spleeter_gapikey");
+	if (k === "") {
+		$("#div-search").hide();
+		return;
+	}
     if (k) {
         gapi.client.setApiKey(k);
     } else {
-        k = prompt("Enter a valid Google API key for youtube v3 API. (go to console.developers.google.com to get an api key)");
+        k = prompt("Enter a valid Google API key for youtube v3 API.\n(https://console.developers.google.com)\nOr leave it blank if you don't plan to use the embedded YouTube search");
+		if (k === "") {
+			setCookie("spleeter_gapikey", "");
+		}
         if (!k) {
             $("#div-search").hide();
             return;
