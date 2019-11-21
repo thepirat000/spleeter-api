@@ -7,7 +7,7 @@ namespace SpleeterAPI.Youtube
     {
         private static string Max_Duration = Startup.Configuration["Spleeter:MaxDuration"];
 
-        public static ShellExecutionResult Split(string inputFile, string fileId, string format, bool includeHighFreq, ILogger log, bool isBatch = false)
+        public static ShellExecutionResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, ILogger log, bool isBatch = false)
         {
             if (format == "karaoke" || format == "vocals")
             {
@@ -26,7 +26,7 @@ namespace SpleeterAPI.Youtube
             }
             var maxDurationParam = Max_Duration == "" ? "" : $"--max_duration {Max_Duration}";
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
-            cmd = $"python -m spleeter separate {inputParam} -o \"/output/{fileId}\" {maxDurationParam} {formatParam} -c mp3";
+            cmd = $"python -m spleeter separate {inputParam} -o \"/output/{outputFolder}\" {maxDurationParam} {formatParam} -c mp3";
             log.LogInformation($"Will execute: {cmd}");
             var result = ShellHelper.Bash(cmd);
             return result;

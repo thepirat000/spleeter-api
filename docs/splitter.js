@@ -37,9 +37,6 @@ $(document).ready(function () {
     }
     let hfConfig = getCookie('spleeter_hf');
     $("#chk-hf").prop('checked', hfConfig === 'true');
-    let oriConfig = getCookie('spleeter_ori');
-    $("#chk-o").prop('checked', oriConfig === 'true');
-
 
     $("#btn-close-wait").on("click", function () {
         stopWait();
@@ -110,6 +107,20 @@ function makeTabs() {
 
         var activeTab = $(this).find('a').attr('href');
         $(activeTab).fadeIn();
+
+        let isYoutube = $("#tab1").is(":visible");
+        if (isYoutube) {
+            $("#div-chk-o").show();
+            $('#type option[data-ext="mp4"]').show();
+        } else {
+            $("#div-chk-o").hide();
+            $('#type option[data-ext="mp4"]').hide();
+            if ($('#type option[data-ext="mp4"]:selected').length)
+            {
+                $('#type').val("karaoke");
+            }
+        }
+
         return false;
     });
 }
@@ -317,14 +328,12 @@ function onFileSplit() {
     }
     let format = $("#type").val();
     $("#file-format").val(format);
-    $("#file-ori").val($("#chk-o").is(':checked'));
     $("#file-hf").val($("#chk-hf").is(':checked'));
 
     startWait();
     
     setCookie('spleeter_format', format, 30);
     setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
-    setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
 
     dzError = false;
     dropzone.processQueue(); 
@@ -352,14 +361,13 @@ function onYoutubeSplit() {
     startWait();
     setCookie('spleeter_format', format, 30);
     setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
-    setCookie('spleeter_ori', $("#chk-o").is(':checked') ? 'true' : 'false', 30);
 
     // Split !
     split(vid, format);
 }
 // Send youtube video to process
 function split(vid, format) {
-    let queryString = "?includeOriginalAudio=" + $("#chk-o").is(':checked') + "&hf=" + $("#chk-hf").is(':checked');
+    let queryString = "?hf=" + $("#chk-hf").is(':checked');
     let processUrl = split_yt_api + "/p/" + format + "/" + vid + queryString;
     $("#btn-split").blur();
 

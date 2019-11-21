@@ -1,8 +1,7 @@
 ﻿namespace SpleeterAPI.Youtube
 {
-    public class YoutubeResponse
+    public class YoutubeAudioResponse
     {
-        public string FileId { get; set; }
         public string AudioFileFullPath { get; set; }
     }
 }

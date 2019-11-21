@@ -158,9 +158,9 @@ ul#tabs-nav li.active {
 }
 #btn-search {
     margin: 0 auto;
-    max-width: 46px;
-    min-width: 16px;
-    width: 10%;
+    max-width: 64px;
+    min-width: 42px;
+    width: 15%;
     padding: 10px 0px 10px 0px;
     background: #2196F3;
     color: white;

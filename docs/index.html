@@ -33,9 +33,6 @@
             <div id="options">
                 <div style="font-size: small;">
                     <div>
-                        <input style="margin-bottom: 10px;" type="checkbox" id="chk-o" value="o" checked="checked"> <label style="font-size: 17px;" for="chk-o" title="Check to include the original audio on the output">Include original audio</label>
-                    </div>
-                    <div>
                         <input type="checkbox" id="chk-hf" value="hf"> <label style="font-size: 17px;" for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
                     </div>
                 </div>
@@ -43,11 +40,13 @@
             <br />
             <span class="section-title">Mode</span>
             <select id='type' title="Type">
-                <option value='karaoke' selected>Karaoke</option>
-                <option value='vocals'>Vocals</option>
-                <option value='2stems'>2 stems (Vocals + Karaoke)</option>
-                <option value='4stems'>4 stems (Bass, Drums, Vocals, Other)</option>
-                <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+                <option value='karaoke' data-ext="mp3" selected>Audio - Karaoke</option>
+                <option value='vocals' data-ext="mp3">Audio - Vocals</option>
+                <option value='2stems' data-ext="zip">Audio - 2 stems (Vocals + Karaoke)</option>
+                <option value='4stems' data-ext="zip">Audio - 4 stems (Bass, Drums, Vocals, Other)</option>
+                <option value='5stems' data-ext="zip">Audio - 5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+                <option value='karaoke+' data-ext="mp4">Video - Karaoke</option>
+                <option value='vocals+' data-ext="mp4">Video - Vocals</option>
             </select>
         </div>
 
@@ -82,7 +81,6 @@
                         <div class="dropzone-container">
                             <form id="uploader" class="dropzone-drop-area">
                                 <input type="hidden" name="includeHf" id="file-hf" />
-                                <input type="hidden" name="includeOri" id="file-ori" />
                                 <input type="hidden" name="format" id="file-format" />
                             </form>
                         </div>

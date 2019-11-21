@@ -31,13 +31,10 @@ namespace SpleeterAPI.Controllers
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("p/{format}/{vid}")]
         [Produces("application/json")]
-        public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
+        public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
-            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
-            {
-                return BadRequest("Format must be '2stems', '4stems' or '5stems'");
-            }
-
+            format = FixFormat(format, out string extension);
+            
             // Get video title and duration
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds == 0)
@@ -50,7 +47,7 @@ namespace SpleeterAPI.Controllers
             }
 
             // Set the file name
-            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
+            var fileId = GetFileId(info.Filename, format, hf, extension == "mp4");
             var now = DateTime.UtcNow;
 
             // Check cache
@@ -62,21 +59,13 @@ namespace SpleeterAPI.Controllers
                     return new ProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
                 }
             }
-            var zipFile = $"/output/{fileId}.zip";
-            if (format == "karaoke" || format == "vocals")
+
+            var outFile = $"/output/{fileId}.{extension}";
+
+            // Check if output file is already on fs
+            if (System.IO.File.Exists(outFile))
             {
-                var mp3File = $"/output/{fileId}.mp3";
-                if (System.IO.File.Exists(mp3File))
-                {
-                    return new ProcessResponse() { FileId = fileId };
-                }
-            }
-            else
-            {
-                if (System.IO.File.Exists(zipFile))
-                {
-                    return new ProcessResponse() { FileId = fileId };
-                }
+                return new ProcessResponse() { FileId = fileId };
             }
 
             _processing[fileId] = now;
@@ -95,8 +84,9 @@ namespace SpleeterAPI.Controllers
                 return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nException: {separateResult.Exception}\nMessages: {separateResult.Output}.");
             }
 
-            if ((format != "karaoke" && format != "vocals") && includeOriginalAudio)
+            if (extension == "zip")
             {
+                // include the original audio
                 System.IO.File.Copy(audioData.AudioFileFullPath, $"/output/{fileId}/original.webm", true);
             }
 
@@ -106,10 +96,15 @@ namespace SpleeterAPI.Controllers
                 // Also copy the vocals
                 System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId.Replace(".karaoke", ".vocals")}.mp3", true);
                 // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
-                var zipFile2stems = zipFile.Replace(".karaoke", ".2stems");
+                var zipFile2stems = $"/output/{this.GetFileId(info.Filename, "2stems", hf, false)}.zip";
                 if (!System.IO.File.Exists(zipFile2stems))
                 {
                     ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                }
+                if (extension == "mp4")
+                {
+                    // Video merge
+                    MakeVideo(vid, $"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp4");
                 }
             }
             else if (format == "vocals")
@@ -118,18 +113,23 @@ namespace SpleeterAPI.Controllers
                 // Also copy the karaoke
                 System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".vocals", ".karaoke")}.mp3", true);
                 // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
-                var zipFile2stems = zipFile.Replace(".vocals", ".2stems");
+                var zipFile2stems = $"/output/{this.GetFileId(info.Filename, "2stems", hf, false)}.zip";
                 if (!System.IO.File.Exists(zipFile2stems))
                 {
                     ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                }
+                if (extension == "mp4")
+                {
+                    // Video merge
+                    MakeVideo(vid, $"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId}.mp4");
                 }
             }
             else
             {
                 // Zip stems
-                if (!System.IO.File.Exists(zipFile))
+                if (!System.IO.File.Exists(outFile))
                 {
-                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile, CompressionLevel.Fastest, false);
+                    ZipFile.CreateFromDirectory($"/output/{fileId}", outFile, CompressionLevel.Fastest, false);
                 }
                 if (format == "2stems")
                 {
@@ -153,89 +153,62 @@ namespace SpleeterAPI.Controllers
         /// <param name="vid">Youtube video ID</param>
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("d/{format}/{vid}")]
-        public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
+        public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
+            format = FixFormat(format, out string extension);
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
-            if (format == "karaoke" || format == "vocals")
+            var fileId = GetFileId(info.Filename, format, hf, extension == "mp4");
+            var outFile = $"/output/{fileId}.{extension}";
+            if (System.IO.File.Exists(outFile))
             {
-                var mp3File = $"/output/{fileId}.mp3";
-                if (System.IO.File.Exists(mp3File))
-                {
-                    return PhysicalFile(mp3File, "audio/mpeg", $"{fileId}.mp3");
-                }
+                var contentType = extension == "mp4" ? "video/mp4" : extension == "zip" ? "application/zip" : "audio/mpeg";
+                return PhysicalFile(outFile, contentType, $"{fileId}.{extension}");
             }
-            var zipFile = $"/output/{fileId}.zip";
-            if (System.IO.File.Exists(zipFile))
-            {
-                return PhysicalFile(zipFile, "application/zip", $"{fileId}.zip");
-            }
-            return Problem($"File {zipFile} not found");
+            return Problem($"File {fileId} not found");
         }
 
-        /// <summary>
-        /// Query the status of a youtube video being splitted
-        /// </summary>
-        /// <param name="vid">Youtube video ID</param>
-        /// <param name="format">2stems, 4stems or 5stems</param>
-        [HttpGet("q/{format}/{vid}")]
-        [Produces("application/json")]
-        public ActionResult<YoutubeStatusResponse> Query([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool includeOriginalAudio = false, [FromQuery] bool hf = false)
-        {
-            var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Filename, format, includeOriginalAudio, hf);
-            var result = new YoutubeStatusResponse() { FileId = fileId };
-            if (_processing.TryGetValue(fileId, out DateTime startDate))
-            {
-                result.StartDate = startDate;
-            }
-            if (format == "karaoke" || format == "vocals")
-            {
-                var mp3File = $"/output/{fileId}.mp3";
-                if (System.IO.File.Exists(mp3File))
-                {
-                    result.Status = "ReadyToDownload";
-                }
-                else
-                {
-                    result.Status = "Unknown";
-                }
-            }
-            else
-            {
-                var zipFile = $"/output/{fileId}.zip";
-                if (System.IO.File.Exists(zipFile))
-                {
-                    result.Status = "ReadyToDownload";
-                }
-                else if (YoutubeHelper.AudioExists(vid))
-                {
-                    result.Status = "Splitting";
-                }
-                else
-                {
-                    result.Status = "Unknown";
-                }
-            }
-            return result;
-        }
-
-        private string GetFileId(string title, string format, bool includeOriginalAudio, bool includeHighFreq)
+        private string GetFileId(string title, string format, bool includeHighFreq, bool isVideo)
         {
             var fileId = $"{title}.{format}";
-            if (includeOriginalAudio || includeHighFreq)
+            if (includeHighFreq || isVideo)
             {
                 fileId += ".";
                 if (includeHighFreq)
                 {
-                    fileId += "hf";
+                    fileId += "h";
                 }
-                if (includeOriginalAudio)
+                if (isVideo)
                 {
-                    fileId += "o";
+                    fileId += "v";
                 }
             }
             return fileId;
+        }
+
+        private string FixFormat(string format, out string extension)
+        {
+            extension = format.EndsWith("+") ? "mp4" : format.EndsWith("stems") ? "zip" : "mp3";
+            format = format.TrimEnd('+');
+            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
+            {
+                throw new ArgumentException("Format must be '2stems', '4stems' or '5stems'");
+            }
+            return format;
+        }
+
+        private void MakeVideo(string vid, string audioFilepath, string outputFilepath)
+        {
+            var video = YoutubeHelper.DownloadVideo(vid);
+            var cmd = $"ffmpeg -i '{video.VideoFileFullPath}' -i '{audioFilepath}' -c:v copy -map 0:v:0 -map 1:a:0 '{outputFilepath}'";
+            var shellResult = ShellHelper.Bash(cmd);
+            if (shellResult.ExitCode != 0)
+            {
+                throw new Exception($"ffmpeg exited with code {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+            }
+            if (!System.IO.File.Exists(outputFilepath))
+            {
+                throw new Exception($"Video filename {outputFilepath} not found after ffmpeg");
+            }
         }
     }
 }
