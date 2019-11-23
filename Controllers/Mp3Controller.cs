@@ -21,6 +21,7 @@ namespace SpleeterAPI.Controllers
     [ApiController]
     public class Mp3Controller : ControllerBase
     {
+        private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private static long Max_Upload_Size = long.Parse(Startup.Configuration["Mp3:MaxUploadSize"]);
         private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
 
@@ -48,7 +49,7 @@ namespace SpleeterAPI.Controllers
                 return BadRequest($"Can't process more than {Max_Upload_Size / 1024:N0} Mb of data");
             }
 
-            var archiveName = GetFileId(Request.Form.Files, format, includeHf, false);
+            var archiveName = GetArchiveName(Request.Form.Files, format, includeHf, false);
 
             var now = DateTime.UtcNow;
             if (_processing.TryGetValue(archiveName, out DateTime startDate))
@@ -64,7 +65,7 @@ namespace SpleeterAPI.Controllers
             {
                 if (Request.Form.Files.Count == 1)
                 {
-                    var mp3File = $"/output/{archiveName}.mp3";
+                    var mp3File = $"{Output_Root}/{archiveName}.mp3";
                     if (System.IO.File.Exists(mp3File))
                     {
                         return new ProcessResponse() { FileId = $"{archiveName}.mp3" };
@@ -72,7 +73,7 @@ namespace SpleeterAPI.Controllers
                 }
             }
 
-            var zipFile = $"/output/{archiveName}.zip";
+            var zipFile = $"{Output_Root}/{archiveName}.zip";
             if (System.IO.File.Exists(zipFile))
             {
                 return new ProcessResponse() { FileId = $"{archiveName}.zip" };
@@ -110,13 +111,13 @@ namespace SpleeterAPI.Controllers
             // 2. call spleeter with those multiple files
             var sw = Stopwatch.StartNew();
             var inputFileParam = string.Join(' ', inputFilenames.Select(fn => $"\"{inputFolder}/{fn}\""));
-            var separateResult = SpliterHelper.Split(inputFileParam, archiveName, format, includeHf, _logger, isBatch: true);
+            var separateResult = SpliterHelper.Split(inputFileParam,  $"{Output_Root}/{archiveName}", format, includeHf, isBatch: true);
             _logger.LogInformation($"Separation for {inputFilenames.Count} files:\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
 
             if (separateResult.ExitCode != 0)
             {
                 _processing.TryRemove(archiveName, out _);
-                return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nException: {separateResult.Exception}\nMessages: {separateResult.Output}.");
+                return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nMessages: {separateResult.Output}.");
             }
 
             // 2.1 If karaoke
@@ -126,8 +127,8 @@ namespace SpleeterAPI.Controllers
                 if (inputFilenames.Count == 1)
                 {
                     var fileToCopy = format == "karaoke" ? "accompaniment.mp3" : "vocals.mp3";
-                    System.IO.File.Copy($"/output/{archiveName}/{Path.GetFileNameWithoutExtension(inputFilenames[0])}/{fileToCopy}", $"/output/{archiveName}.mp3", true);
-                    Directory.Delete($"/output/{archiveName}", true);
+                    System.IO.File.Copy($"{Output_Root}/{archiveName}/{Path.GetFileNameWithoutExtension(inputFilenames[0])}/{fileToCopy}", $"{Output_Root}/{archiveName}.mp3", true);
+                    Directory.Delete($"{Output_Root}/{archiveName}", true);
                     Directory.Delete(inputFolder, true);
                     _processing.TryRemove(archiveName, out _);
                     return new ProcessResponse() { FileId = $"{archiveName}.mp3" };
@@ -136,7 +137,7 @@ namespace SpleeterAPI.Controllers
                 {
                     // More than 1 karaoke -> remove all the vocals.mp3
                     var fileToRemove = format == "karaoke" ? "vocals.mp3" : "accompaniment.mp3";
-                    foreach (var file in Directory.EnumerateFiles($"/output/{archiveName}", fileToRemove, SearchOption.AllDirectories))
+                    foreach (var file in Directory.EnumerateFiles($"{Output_Root}/{archiveName}", fileToRemove, SearchOption.AllDirectories))
                     {
                         System.IO.File.Delete(file);
                     }
@@ -144,10 +145,10 @@ namespace SpleeterAPI.Controllers
             }
 
             // 3. Zip the output folder
-            ZipFile.CreateFromDirectory($"/output/{archiveName}", zipFile, CompressionLevel.Fastest, false);
+            ZipFile.CreateFromDirectory($"{Output_Root}/{archiveName}", zipFile, CompressionLevel.Fastest, false);
 
             // 4. Delete temp files
-            Directory.Delete($"/output/{archiveName}", true);
+            Directory.Delete($"{Output_Root}/{archiveName}", true);
             Directory.Delete(inputFolder, true);
             
             _processing.TryRemove(archiveName, out _);
@@ -164,7 +165,7 @@ namespace SpleeterAPI.Controllers
             {
                 return BadRequest();
             }
-            var file = $"/output/{fn}";
+            var file = $"{Output_Root}/{fn}";
             var cType = fn.ToLower().EndsWith("zip") ? "application/zip" : "application/mp3";
             if (System.IO.File.Exists(file))
             {
@@ -173,7 +174,7 @@ namespace SpleeterAPI.Controllers
             return Problem($"File {fn} not found");
         }
 
-        private string GetFileId(IFormFileCollection files, string format, bool includeHf, bool includeOri)
+        private string GetArchiveName(IFormFileCollection files, string format, bool includeHf, bool includeOri)
         {
             int hash1 = string.Join('|', files.OrderBy(f => f.FileName).Select(f => f.FileName).ToArray()).GetStableHashCode();
             int hash2 = (int)(files.Sum(f => f.Length) % int.MaxValue);

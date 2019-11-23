@@ -3,22 +3,24 @@ using System.Diagnostics;
 using System.Text;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 
 namespace SpleeterAPI
 {
     public static class ShellHelper
     {
-        public static ShellExecutionResult Bash(string cmd)
+        public static ShellExecutionResult Execute(string cmd)
         {
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             Console.WriteLine($"Will execute: {cmd}");
-            var escapedArgs = cmd.Replace("\"", "\\\"");
+            var escapedArgs = isWindows ? cmd : cmd.Replace("\"", "\\\"");
             var outputBuilder = new StringBuilder();
             var process = new Process()
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/bin/bash",
-                    Arguments = $"-c \"{escapedArgs}\"",
+                    FileName = isWindows ? "cmd.exe" : "/bin/bash",
+                    Arguments = isWindows ? $"/C \"{escapedArgs}\"" : $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,

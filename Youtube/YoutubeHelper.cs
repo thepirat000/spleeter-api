@@ -9,6 +9,7 @@ namespace SpleeterAPI.Youtube
     {
         private static string Youtube_User = Startup.Configuration["Youtube:User"];
         private static string Youtube_Pass = Startup.Configuration["Youtube:Pass"];
+        private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private static ConcurrentDictionary<string, YoutubeVideoInfo> _videoInfoCache = new ConcurrentDictionary<string, YoutubeVideoInfo>();
 
         public static YoutubeVideoInfo GetVideoInfo(string vid)
@@ -18,15 +19,15 @@ namespace SpleeterAPI.Youtube
                 return cachedInfo;
             }
             var cmd = $"youtube-dl -s --get-filename --get-duration {vid}";
-            var shellResult = ShellHelper.Bash(cmd);
+            var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl -s exited with code {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+                throw new Exception($"youtube-dl -s exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
-            var dataArray = shellResult.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var dataArray = shellResult.Output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             if (dataArray.Length < 2)
             {
-                throw new Exception($"youtube-dl -s returned unformatted data {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+                throw new Exception($"youtube-dl -s returned unformatted data {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             var info = new YoutubeVideoInfo()
             {
@@ -63,12 +64,12 @@ namespace SpleeterAPI.Youtube
                 result.AudioFileFullPath = fileName;
                 return result;
             }
-            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : $"-u '{Youtube_User}' -p '{Youtube_Pass}'";
-            var cmd = $"youtube-dl -f 'bestaudio' --no-playlist {userPassParams} -o '{fileName}' {vid}";
-            var shellResult = ShellHelper.Bash(cmd);
+            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}""";
+            var cmd = @$"youtube-dl -f bestaudio --no-playlist {userPassParams} -o ""{fileName}"" {vid}";
+            var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl audio exited with code {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+                throw new Exception($"youtube-dl audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             if (!File.Exists(fileName))
             {
@@ -87,13 +88,13 @@ namespace SpleeterAPI.Youtube
                 result.VideoFileFullPath = fileName;
                 return result;
             }
-            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : $"-u '{Youtube_User}' -p '{Youtube_Pass}'";
-            var cmd = $"youtube-dl -f 'bestvideo[height<=720][ext=mp4]' --max-filesize 50M {userPassParams} -o '{fileName}' {vid}";
+            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}""";
+            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams} -o ""{fileName}"" {vid}";
             
-            var shellResult = ShellHelper.Bash(cmd);
+            var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl video exited with code {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+                throw new Exception($"youtube-dl video exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             if (!File.Exists(fileName))
             {
@@ -111,12 +112,12 @@ namespace SpleeterAPI.Youtube
 
         private static string GetAudioFilename(string vid)
         {
-            return $"/output/download.audio/{vid}";
+            return $"{Output_Root}/download.audio/{vid}";
         }
 
         private static string GetVideoFilename(string vid)
         {
-            return $"/output/download.audio/{vid}.mp4";
+            return $"{Output_Root}/download.audio/{vid}.mp4";
         }
     }
 }

@@ -18,6 +18,7 @@ namespace SpleeterAPI.Controllers
         private readonly ILogger<YoutubeController> _logger;
         private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
         private static int Max_Duration_Seconds = int.Parse(Startup.Configuration["Youtube:MaxDuration"]);
+        private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
 
         public YoutubeController(ILogger<YoutubeController> logger)
         {
@@ -47,81 +48,81 @@ namespace SpleeterAPI.Controllers
             }
 
             // Set the file name
-            var fileId = GetFileId(info.Filename, format, hf, extension == "mp4");
+            var archiveName = GetArchiveName(info.Filename, format, hf, extension == "mp4");
             var now = DateTime.UtcNow;
 
             // Check cache
-            if (_processing.TryGetValue(fileId, out DateTime startDate))
+            if (_processing.TryGetValue(archiveName, out DateTime startDate))
             {
                 var startedSecondsAgo = (now - startDate).TotalSeconds;
                 if (startedSecondsAgo < 1800)
                 {
-                    return new ProcessResponse() { Error = $"File {fileId} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
+                    return new ProcessResponse() { Error = $"File {archiveName} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
                 }
             }
 
-            var outFile = $"/output/{fileId}.{extension}";
+            var outFile = $"{Output_Root}/{archiveName}.{extension}";
 
             // Check if output file is already on fs
             if (System.IO.File.Exists(outFile))
             {
-                return new ProcessResponse() { FileId = fileId };
+                return new ProcessResponse() { FileId = archiveName };
             }
 
-            _processing[fileId] = now;
+            _processing[archiveName] = now;
 
             // Download audio from youtube vid
-            var audioData = YoutubeHelper.DownloadAudio(vid, fileId);
+            var audioData = YoutubeHelper.DownloadAudio(vid, archiveName);
 
             // Separate audio stems
             var sw = Stopwatch.StartNew();
-            var separateResult = SpliterHelper.Split(audioData.AudioFileFullPath, fileId, format, hf, _logger);
-            _logger.LogInformation($"Separation for {fileId}:\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
+            var separateResult = SpliterHelper.Split(audioData.AudioFileFullPath, $"{Output_Root}/{archiveName}", format, hf, isBatch: false);
+            _logger.LogInformation($"Separation for {archiveName}:\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
 
             if (separateResult.ExitCode != 0)
             {
-                _processing.TryRemove(fileId, out _);
-                return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nException: {separateResult.Exception}\nMessages: {separateResult.Output}.");
+                _processing.TryRemove(archiveName, out _);
+                return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nMessages: {separateResult.Output}.");
             }
 
-            if (extension == "zip")
+            if (extension == "zip" || extension == "mp3")
             {
                 // include the original audio
-                System.IO.File.Copy(audioData.AudioFileFullPath, $"/output/{fileId}/original.webm", true);
+                System.IO.File.Copy(audioData.AudioFileFullPath, $"{Output_Root}/{archiveName}/original.webm", true);
             }
 
             if (format == "karaoke")
             {
-                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp3", true);
+                System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName}.mp3", true);
                 // Also copy the vocals
-                System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId.Replace(".karaoke", ".vocals")}.mp3", true);
+                System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName.Replace(".karaoke", ".vocals")}.mp3", true);
                 // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
-                var zipFile2stems = $"/output/{this.GetFileId(info.Filename, "2stems", hf, false)}.zip";
+                var zipFile2stems = $"{Output_Root}/{this.GetArchiveName(info.Filename, "2stems", hf, false)}.zip";
                 if (!System.IO.File.Exists(zipFile2stems))
                 {
-                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                    ZipFile.CreateFromDirectory($"{Output_Root}/{archiveName}", zipFile2stems, CompressionLevel.Fastest, false);
                 }
                 if (extension == "mp4")
                 {
                     // Video merge
-                    MakeVideo(vid, $"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId}.mp4");
+                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName}.mp4");
                 }
             }
             else if (format == "vocals")
             {
-                System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId}.mp3", true);
+                System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName}.mp3", true);
                 // Also copy the karaoke
-                System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".vocals", ".karaoke")}.mp3", true);
+                System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName.Replace(".vocals", ".karaoke")}.mp3", true);
                 // Also zip the 2stems to the output folder, to avoid processing again if 2stems is requested
-                var zipFile2stems = $"/output/{this.GetFileId(info.Filename, "2stems", hf, false)}.zip";
+                var zipFile2stems = $"{Output_Root}/{this.GetArchiveName(info.Filename, "2stems", hf, false)}.zip";
                 if (!System.IO.File.Exists(zipFile2stems))
                 {
-                    ZipFile.CreateFromDirectory($"/output/{fileId}", zipFile2stems, CompressionLevel.Fastest, false);
+                    ZipFile.CreateFromDirectory($"{Output_Root}/{archiveName}", zipFile2stems, CompressionLevel.Fastest, false);
                 }
                 if (extension == "mp4")
                 {
                     // Video merge
-                    MakeVideo(vid, $"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId}.mp4");
+                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName}.mp4");
                 }
             }
             else
@@ -129,22 +130,22 @@ namespace SpleeterAPI.Controllers
                 // Zip stems
                 if (!System.IO.File.Exists(outFile))
                 {
-                    ZipFile.CreateFromDirectory($"/output/{fileId}", outFile, CompressionLevel.Fastest, false);
+                    ZipFile.CreateFromDirectory($"{Output_Root}/{archiveName}", outFile, CompressionLevel.Fastest, false);
                 }
                 if (format == "2stems")
                 {
                     // Also copy the karaoke & vocals mp3s to the output, to avoid processing again 
-                    System.IO.File.Copy($"/output/{fileId}/{vid}/accompaniment.mp3", $"/output/{fileId.Replace(".2stems", ".karaoke")}.mp3", true);
-                    System.IO.File.Copy($"/output/{fileId}/{vid}/vocals.mp3", $"/output/{fileId.Replace(".2stems", ".vocals")}.mp3", true);
+                    System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName.Replace(".2stems", ".karaoke")}.mp3", true);
+                    System.IO.File.Copy($"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName.Replace(".2stems", ".vocals")}.mp3", true);
                 }
             }
 
             // Delete temp files
-            System.IO.Directory.Delete($"/output/{fileId}", true);
+            System.IO.Directory.Delete($"{Output_Root}/{archiveName}", true);
 
-            _processing.TryRemove(fileId, out _);
+            _processing.TryRemove(archiveName, out _);
 
-            return new ProcessResponse() { FileId = fileId };
+            return new ProcessResponse() { FileId = archiveName };
         }
 
         /// <summary>
@@ -157,8 +158,8 @@ namespace SpleeterAPI.Controllers
         {
             format = FixFormat(format, out string extension);
             var info = YoutubeHelper.GetVideoInfo(vid);
-            var fileId = GetFileId(info.Filename, format, hf, extension == "mp4");
-            var outFile = $"/output/{fileId}.{extension}";
+            var fileId = GetArchiveName(info.Filename, format, hf, extension == "mp4");
+            var outFile = $"{Output_Root}/{fileId}.{extension}";
             if (System.IO.File.Exists(outFile))
             {
                 var contentType = extension == "mp4" ? "video/mp4" : extension == "zip" ? "application/zip" : "audio/mpeg";
@@ -167,20 +168,12 @@ namespace SpleeterAPI.Controllers
             return Problem($"File {fileId} not found");
         }
 
-        private string GetFileId(string title, string format, bool includeHighFreq, bool isVideo)
+        private string GetArchiveName(string title, string format, bool includeHighFreq, bool isVideo)
         {
             var fileId = $"{title}.{format}";
-            if (includeHighFreq || isVideo)
+            if (includeHighFreq)
             {
-                fileId += ".";
-                if (includeHighFreq)
-                {
-                    fileId += "h";
-                }
-                if (isVideo)
-                {
-                    fileId += "v";
-                }
+                fileId += ".h";
             }
             return fileId;
         }
@@ -200,10 +193,10 @@ namespace SpleeterAPI.Controllers
         {
             var video = YoutubeHelper.DownloadVideo(vid);
             var cmd = $"ffmpeg -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -map 0:v:0 -map 1:a:0 \"{outputFilepath}\"";
-            var shellResult = ShellHelper.Bash(cmd);
+            var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"ffmpeg exited with code {shellResult.ExitCode}.\n{shellResult.Exception}\n{shellResult.Output}");
+                throw new Exception($"ffmpeg exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             if (!System.IO.File.Exists(outputFilepath))
             {

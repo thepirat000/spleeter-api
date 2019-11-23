@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -14,7 +15,12 @@ namespace SpleeterAPI.Controllers
         [HttpGet]
         public string Get()
         {
-            var x = JsonSerializer.Serialize(new { Environment.MachineName, Environment.OSVersion, Environment.ProcessorCount });
+            var x = JsonSerializer.Serialize(new 
+            { 
+                Environment.MachineName,
+                OSArchitecture = RuntimeInformation.OSArchitecture.ToString(),
+                OSDescription = RuntimeInformation.OSDescription.ToString(),
+                Environment.ProcessorCount });
             return x;
 
         }

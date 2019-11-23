@@ -1,34 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SpleeterAPI.Youtube
 {
+
     public static class SpliterHelper
     {
-        private static string Max_Duration = Startup.Configuration["Spleeter:MaxDuration"];
-
-        public static ShellExecutionResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, ILogger log, bool isBatch = false)
+        public static SplitProcessStatus Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
-            if (format == "karaoke" || format == "vocals")
-            {
-                format = "2stems";
-            }
-            string cmd;
-            
-            string formatParam;
-            if (includeHighFreq)
-            {
-                formatParam = $"-p alt-config/{format}/base_config_hf.json";
-            }
-            else
-            {
-                formatParam = $"-p spleeter:{format}";
-            }
-            var maxDurationParam = Max_Duration == "" ? "" : $"--max_duration {Max_Duration}";
-            var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
-            cmd = $"python -m spleeter separate {inputParam} -o \"/output/{outputFolder}\" {maxDurationParam} {formatParam} -c mp3";
-            var result = ShellHelper.Bash(cmd);
-            return result;
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            ISplitterAdapter adapter = isWindows ? (ISplitterAdapter)new SplitterCmdAdapter() : new SplitterBashAdapter();
+            return adapter?.Split(inputFile, outputFolder, format, includeHighFreq, isBatch);
         }
+
     }
 }
