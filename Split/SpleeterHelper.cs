@@ -12,7 +12,7 @@ namespace SpleeterAPI.Youtube
     {
         public static SplitProcessStatus Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isWindows = Startup.IsWindows;
             ISplitterAdapter adapter = isWindows ? (ISplitterAdapter)new SplitterCmdAdapter() : new SplitterBashAdapter();
             return adapter?.Split(inputFile, outputFolder, format, includeHighFreq, isBatch);
         }

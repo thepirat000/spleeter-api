@@ -11,7 +11,7 @@ namespace SpleeterAPI
     {
         public static ShellExecutionResult Execute(string cmd)
         {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isWindows = Startup.IsWindows;
             Console.WriteLine($"Will execute: {cmd}");
             var escapedArgs = isWindows ? cmd : cmd.Replace("\"", "\\\"");
             var outputBuilder = new StringBuilder();

@@ -79,7 +79,7 @@ namespace SpleeterAPI.Youtube
             return result;
         }
 
-        public static YoutubeVideoResponse DownloadVideo(string vid)
+        public static YoutubeVideoResponse DownloadVideo(string vid, bool includeSubtitles)
         {
             var result = new YoutubeVideoResponse();
             var fileName = GetVideoFilename(vid);
@@ -88,9 +88,10 @@ namespace SpleeterAPI.Youtube
                 result.VideoFileFullPath = fileName;
                 return result;
             }
-            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}""";
-            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams} -o ""{fileName}"" {vid}";
-            
+            var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}"" ";
+            var embedSubs = includeSubtitles ? "--write-sub --embed-subs " : "";
+            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams}-o ""{fileName}"" {embedSubs}{vid}";
+
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {

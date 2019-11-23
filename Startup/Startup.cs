@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,14 +22,16 @@ namespace SpleeterAPI
             Configuration = configuration;
         }
 
+        public static bool IsWindows { get; private set; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
         public static IConfiguration Configuration { get; private set; }
         public static IWebHostEnvironment Environment { get; private set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Do not use CORS, should be added by nginx proxy
-            if (Environment.IsDevelopment())
+            // Do not use CORS for linux, should be added by nginx 
+            if (Environment.IsDevelopment() || IsWindows)
             { 
                 services.AddCors();
             }
@@ -44,16 +47,16 @@ namespace SpleeterAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            // Do not use HTTPS redirection since it will be done via nginx proxy
-            if (Environment.IsDevelopment())
+            // Do not use HTTPS redirection in linux, since it will be done via nginx 
+            if (Environment.IsDevelopment() || IsWindows)
             { 
                 app.UseHttpsRedirection();
             }
 
             app.UseRouting();
 
-            // Do not use CORS, should be added by nginx proxy
-            if (Environment.IsDevelopment())
+            // Do not use CORS for linux, should be added by nginx 
+            if (Environment.IsDevelopment() || IsWindows)
             {
                 app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             }

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ namespace SpleeterAPI.Controllers
 
     [Route("yt")]
     [ApiController]
+    [EnableCors]
     public class YoutubeController : ControllerBase
     {
         private readonly ILogger<YoutubeController> _logger;
@@ -90,7 +92,8 @@ namespace SpleeterAPI.Controllers
             var rightFolder = $"{Output_Root}/{archiveName}/{vid}";
             if (System.IO.Directory.Exists(wrongFolder) && !System.IO.Directory.Exists(rightFolder))
             {
-                Console.WriteLine($"WARNING: Fixing folder name from {wrongFolder} to {rightFolder}");
+                _logger.LogInformation($"WARNING: Fixing folder name from {wrongFolder} to {rightFolder}");
+                System.Threading.Thread.Sleep(1500);
                 System.IO.Directory.Move(wrongFolder, rightFolder);
             }
 
@@ -114,7 +117,7 @@ namespace SpleeterAPI.Controllers
                 if (extension == "mp4")
                 {
                     // Video merge
-                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName}.mp4");
+                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/accompaniment.mp3", $"{Output_Root}/{archiveName}.mp4", includeSubtitles: true);
                 }
             }
             else if (format == "vocals")
@@ -131,7 +134,7 @@ namespace SpleeterAPI.Controllers
                 if (extension == "mp4")
                 {
                     // Video merge
-                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName}.mp4");
+                    MakeVideo(vid, $"{Output_Root}/{archiveName}/{vid}/vocals.mp3", $"{Output_Root}/{archiveName}.mp4", includeSubtitles: true);
                 }
             }
             else
@@ -189,8 +192,8 @@ namespace SpleeterAPI.Controllers
 
         private string FixFormat(string format, out string extension)
         {
-            extension = format.EndsWith("+") ? "mp4" : format.EndsWith("stems") ? "zip" : "mp3";
-            format = format.TrimEnd('+');
+            extension = format.EndsWith("_v") ? "mp4" : format.EndsWith("stems") ? "zip" : "mp3";
+            format = format.EndsWith("_v") ? format[0..^2] : format;
             if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
             {
                 throw new ArgumentException("Format must be '2stems', '4stems' or '5stems'");
@@ -198,10 +201,11 @@ namespace SpleeterAPI.Controllers
             return format;
         }
 
-        private void MakeVideo(string vid, string audioFilepath, string outputFilepath)
+        private void MakeVideo(string vid, string audioFilepath, string outputFilepath, bool includeSubtitles)
         {
-            var video = YoutubeHelper.DownloadVideo(vid);
-            var cmd = $"ffmpeg -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -map 0:v:0 -map 1:a:0 \"{outputFilepath}\"";
+            var video = YoutubeHelper.DownloadVideo(vid, includeSubtitles);
+            //ffmpeg -i "The Weeknd - False Alarm-CW5oGRx9CLM.mp4" -i YYOKMUTTDdA.audio -c:v copy -c:s mov_text -map 0:v:0 -map 1:a:0 -map 0:s:0? output1.mp4
+            var cmd = $"ffmpeg -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -c:s mov_text -map 0:v:0 -map 1:a:0 -map 0:s:0? \"{outputFilepath}\"";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {

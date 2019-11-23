@@ -7,11 +7,12 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DockerfileContext>.</DockerfileContext>
     <DockerfileRunArguments>-v "C:/spleeter/input:/input" -v "C:/spleeter/output:/output" -v "C:/Spleeter/model":/model -e MODEL_PATH=/model</DockerfileRunArguments>
+    <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
   
   <ItemGroup>
-    <Compile Remove="alt-config\**" />
     <Compile Remove="API\**" />
     <Compile Remove="conda\**" />
     <Compile Remove="configs\**" />
@@ -21,7 +22,6 @@
     <Compile Remove="nginx\**" />
     <Compile Remove="pretrained_models\**" />
     <Compile Remove="spleeter\**" />
-    <Content Remove="alt-config\**" />
     <Content Remove="API\**" />
     <Content Remove="conda\**" />
     <Content Remove="configs\**" />
@@ -31,7 +31,6 @@
     <Content Remove="nginx\**" />
     <Content Remove="pretrained_models\**" />
     <Content Remove="spleeter\**" />
-    <EmbeddedResource Remove="alt-config\**" />
     <EmbeddedResource Remove="API\**" />
     <EmbeddedResource Remove="conda\**" />
     <EmbeddedResource Remove="configs\**" />
@@ -41,7 +40,6 @@
     <EmbeddedResource Remove="nginx\**" />
     <EmbeddedResource Remove="pretrained_models\**" />
     <EmbeddedResource Remove="spleeter\**" />
-    <None Remove="alt-config\**" />
     <None Remove="API\**" />
     <None Remove="conda\**" />
     <None Remove="configs\**" />
@@ -71,6 +69,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="alt-config\2stems\base_config_hf.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

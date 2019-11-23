@@ -13,12 +13,14 @@ using Microsoft.Extensions.Logging;
 using SpleeterAPI.Youtube;
 using SpleeterAPI.Split;
 using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Cors;
 
 namespace SpleeterAPI.Controllers
 {
 
     [Route("mp3")]
     [ApiController]
+    [EnableCors]
     public class Mp3Controller : ControllerBase
     {
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
