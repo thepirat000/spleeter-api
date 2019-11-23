@@ -25,7 +25,7 @@ namespace SpleeterAPI
             .ConfigureAppConfiguration((hostingContext, config) =>
             {
                 var env = hostingContext.HostingEnvironment;
-
+                Console.WriteLine($"\n\nENV: {env.EnvironmentName}\n\n");
                 config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                       .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true); 
             });
