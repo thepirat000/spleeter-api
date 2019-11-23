@@ -1,8 +1,16 @@
 var buttonSplit = $("#btn-split");
 var buttonSearch = $("#btn-search");
 var max_duration_mins = 30;
-var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt'; //'https://localhost:44319/yt';
-var split_mp3_api = 'https://spleeter.eastus.cloudapp.azure.com/mp3'; //'https://localhost:44319/mp3'; // 'http://localhost:5000/mp3'; 
+
+//var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
+//var split_mp3_api = 'https://spleeter.eastus.cloudapp.azure.com/mp3'; 
+//var split_yt_api = 'https://localhost:5001/yt';
+//var split_mp3_api = 'https://localhost:5001/mp3'; 
+
+var split_yt_api = 'https://spleeter-gpu.eastus.cloudapp.azure.com/yt';
+var split_mp3_api = 'https://spleeter-gpu.eastus.cloudapp.azure.com/mp3';
+
+
 var selectedFiles = [];
 var dropzone;
 var dzError = false;
@@ -363,7 +371,7 @@ function onYoutubeSplit() {
     let vid = validateUrl();
     let format = $("#type").val();
     if (vid === null || format === null) {
-        return;
+        alert("Please select a video and format");
     }
     startWait();
     setCookie('spleeter_format', format, 30);
@@ -393,7 +401,7 @@ function split(vid, format) {
         },
         error: function (jqXHR, textStatus, errorThrown) {
             stopWait();
-            alert("ERROR processing " + vid + ": " + JSON.stringify(jqXHR));
+            alert("Error processing " + vid + ":\n" + textStatus);
         }
     });
 }
