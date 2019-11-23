@@ -85,6 +85,15 @@ namespace SpleeterAPI.Controllers
                 return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nMessages: {separateResult.Output}.");
             }
 
+            // Workaround spleeter separate generating output folder as: "('B3gbisdtJnA', '')" instead of just "B3gbisdtJnA" 
+            var wrongFolder = $"{Output_Root}/{archiveName}/('{vid}', '')";
+            var rightFolder = $"{Output_Root}/{archiveName}/{vid}";
+            if (System.IO.Directory.Exists(wrongFolder) && !System.IO.Directory.Exists(rightFolder))
+            {
+                Console.WriteLine($"WARNING: Fixing folder name from {wrongFolder} to {rightFolder}");
+                System.IO.Directory.Move(wrongFolder, rightFolder);
+            }
+
             if (extension == "zip" || extension == "mp3")
             {
                 // include the original audio
