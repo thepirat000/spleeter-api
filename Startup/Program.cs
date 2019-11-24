@@ -34,6 +34,7 @@ namespace SpleeterAPI
                 logging.ClearProviders();
                 logging.AddConsole();
                 logging.AddEventLog(new Microsoft.Extensions.Logging.EventLog.EventLogSettings() { SourceName = "spleeter" });
+                logging.AddProvider(new EphemeralLoggerProvider());
             });
     }
 }

@@ -53,7 +53,7 @@ namespace SpleeterAPI.Controllers
                 return BadRequest($"Can't process more than {Max_Upload_Size / 1024:N0} Mb of data");
             }
 
-            var archiveName = GetArchiveName(Request.Form.Files, format, includeHf, false);
+            var archiveName = GetArchiveName(Request.Form.Files, format, includeHf);
 
             var now = DateTime.UtcNow;
             if (_processing.TryGetValue(archiveName, out DateTime startDate))
@@ -181,23 +181,15 @@ namespace SpleeterAPI.Controllers
             return Problem($"File {fn} not found");
         }
 
-        private string GetArchiveName(IFormFileCollection files, string format, bool includeHf, bool includeOri)
+        private string GetArchiveName(IFormFileCollection files, string format, bool includeHf)
         {
             int hash1 = string.Join('|', files.OrderBy(f => f.FileName).Select(f => f.FileName).ToArray()).GetStableHashCode();
             int hash2 = (int)(files.Sum(f => f.Length) % int.MaxValue);
             var fileId = StringHelper.SeededString(hash1, 8) + StringHelper.SeededString(hash2, 8);
             fileId += $".{format}";
-            if (includeOri || includeHf)
+            if (includeHf)
             {
-                fileId += ".";
-                if (includeHf)
-                {
-                    fileId += "hf";
-                }
-                if (includeOri)
-                {
-                    fileId += "o";
-                }
+                fileId += ".hf";
             }
             return fileId;
         }
