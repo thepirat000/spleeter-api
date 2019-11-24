@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
+using Audit.WebApi;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace SpleeterAPI.Controllers
     [Route("yt")]
     [ApiController]
     [EnableCors]
+    [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true)]
     public class YoutubeController : ControllerBase
     {
         private readonly ILogger<YoutubeController> _logger;

@@ -11,6 +11,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Audit.Core;
+using Audit.Udp;
+using Audit.Udp.Configuration;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace SpleeterAPI
 {
@@ -42,6 +48,8 @@ namespace SpleeterAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            ConfigureAuditNet();
+
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -68,5 +76,36 @@ namespace SpleeterAPI
                 endpoints.MapControllers();
             });
         }
+
+        private void ConfigureAuditNet()
+        {
+            Audit.Core.Configuration.Setup()
+                .UseUdp(_ => _
+                    .RemoteAddress("127.0.0.1")
+                    .RemotePort(2223)
+                    .CustomSerializer(ev =>
+                    {
+                        if (ev.EventType == "Ephemeral")
+                        {
+                            return Encoding.UTF8.GetBytes(ev.CustomFields["Status"] as string);
+                        }
+                        else
+                        {
+                            return Encoding.UTF8.GetBytes(ev.ToJson());
+                        }
+                    }));
+            
+            EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}");
+        }
+
+        public static void EphemeralLog(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                Console.WriteLine(text);
+                Audit.Core.AuditScope.CreateAndSave("Ephemeral", new { Status = text });
+            }
+        }
+
     }
 }

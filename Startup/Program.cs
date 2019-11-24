@@ -22,12 +22,18 @@ namespace SpleeterAPI
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-            .ConfigureAppConfiguration((hostingContext, config) =>
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
+                    Console.WriteLine($"ENV: {env.EnvironmentName}");
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true);
+                })
+            .ConfigureLogging(logging =>
             {
-                var env = hostingContext.HostingEnvironment;
-                Console.WriteLine($"\n\nENV: {env.EnvironmentName}\n\n");
-                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                      .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true); 
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.AddEventLog(new Microsoft.Extensions.Logging.EventLog.EventLogSettings() { SourceName = "spleeter" });
             });
     }
 }
