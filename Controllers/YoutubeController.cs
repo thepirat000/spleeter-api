@@ -90,13 +90,27 @@ namespace SpleeterAPI.Controllers
             }
 
             // Workaround spleeter separate generating output folder as: "('B3gbisdtJnA', '')" instead of just "B3gbisdtJnA" 
+            System.Threading.Thread.Sleep(1000);
             var wrongFolder = $"{Output_Root}/{archiveName}/('{vid}', '')";
             var rightFolder = $"{Output_Root}/{archiveName}/{vid}";
             if (System.IO.Directory.Exists(wrongFolder) && !System.IO.Directory.Exists(rightFolder))
             {
                 _logger.LogInformation($"WARNING: Fixing folder name from {wrongFolder} to {rightFolder}");
-                System.Threading.Thread.Sleep(1500);
                 System.IO.Directory.Move(wrongFolder, rightFolder);
+                for (int i = 0; i < 10; i++)
+                {
+                    if (System.IO.Directory.Exists(wrongFolder))
+                    {
+                        Startup.EphemeralLog("Wait 1 sec for directory move...");
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                
             }
 
             if (extension == "zip" || extension == "mp3")
