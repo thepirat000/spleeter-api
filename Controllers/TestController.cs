@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Audit.WebApi;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace SpleeterAPI.Controllers
     [ApiController]
     [Route("[controller]")]
     [EnableCors]
+    [AuditApi]
     public class TestController : ControllerBase
     {
         [HttpGet]

@@ -16,7 +16,7 @@ namespace SpleeterAPI.Controllers
     [Route("yt")]
     [ApiController]
     [EnableCors]
-    [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true)]
+    [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = true)]
     public class YoutubeController : ControllerBase
     {
         private readonly ILogger<YoutubeController> _logger;
@@ -173,6 +173,7 @@ namespace SpleeterAPI.Controllers
         /// <param name="vid">Youtube video ID</param>
         /// <param name="format">2stems, 4stems or 5stems</param>
         [HttpGet("d/{format}/{vid}")]
+        [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = false)]
         public ActionResult Download([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
             format = FixFormat(format, out string extension);

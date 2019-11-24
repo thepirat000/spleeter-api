@@ -22,7 +22,7 @@ namespace SpleeterAPI.Controllers
     [Route("mp3")]
     [ApiController]
     [EnableCors]
-    [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true)]
+    [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = true)]
     public class Mp3Controller : ControllerBase
     {
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
@@ -165,7 +165,7 @@ namespace SpleeterAPI.Controllers
 
 
         [HttpGet("d")]
-        [Produces("application/json")]
+        [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = false)]
         public ActionResult Download([FromQuery] string fn)
         {
             if (string.IsNullOrWhiteSpace(fn))
