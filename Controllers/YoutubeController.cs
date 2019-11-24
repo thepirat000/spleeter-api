@@ -157,7 +157,12 @@ namespace SpleeterAPI.Controllers
 
             _processing.TryRemove(archiveName, out _);
 
-            return new ProcessResponse() { FileId = archiveName };
+            return new ProcessResponse()
+            {
+                FileId = archiveName,
+                Speed = sw.Elapsed.TotalSeconds == 0 ? null : $"{info.DurationSeconds / sw.Elapsed.TotalSeconds:N1}x",
+                TotalTime = sw.Elapsed.ToString("hh\\:mm\\:ss")
+            };
         }
 
         /// <summary>

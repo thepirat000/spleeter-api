@@ -18,7 +18,7 @@ namespace SpleeterAPI.Youtube
             {
                 return cachedInfo;
             }
-            var cmd = @$"youtube-dl -s --get-filename --get-duration ""{vid}""";
+            var cmd = @$"youtube-dl -s --get-filename --get-duration ""https://youtu.be/{vid}""";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
@@ -65,7 +65,7 @@ namespace SpleeterAPI.Youtube
                 return result;
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}""";
-            var cmd = @$"youtube-dl -f bestaudio --no-playlist {userPassParams} -o ""{fileName}"" ""{vid}""";
+            var cmd = @$"youtube-dl -f bestaudio --no-playlist {userPassParams} -o ""{fileName}"" ""https://youtu.be/{vid}""";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
@@ -90,7 +90,7 @@ namespace SpleeterAPI.Youtube
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}"" ";
             var embedSubs = includeSubtitles ? "--write-sub --embed-subs " : "";
-            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams}-o ""{fileName}"" {embedSubs}""{vid}""";
+            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams}-o ""{fileName}"" {embedSubs}""https://youtu.be/{vid}""";
 
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)

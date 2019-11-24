@@ -155,7 +155,10 @@ namespace SpleeterAPI.Controllers
             
             _processing.TryRemove(archiveName, out _);
 
-            return new ProcessResponse() { FileId = $"{archiveName}.zip" };
+            return new ProcessResponse() 
+            { 
+                FileId = $"{archiveName}.zip"
+            };
         }
 
 
