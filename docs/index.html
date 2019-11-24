@@ -63,7 +63,10 @@
                 <div id="tab1" class="tab-content">
                     <div id="div-search" style="display:none;" class="banner-message">
                         <div>
-                            <input id="search" class="search" autocapitalize="none" autocomplete="off" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
+                            <div style="margin-bottom: 7px;">
+                                <input type="checkbox" id="chk-cc" value="cc"> <label style="font-size: 17px;" for="chk-cc" title="Check to only include videos with closed captions (subtitles) on the search">Only videos with subtitles</label>
+                            </div>
+                            <input id="search" class="search" autocapitalize="none" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
                             <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
                         </div>
                         <div id="search-results">

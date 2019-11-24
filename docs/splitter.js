@@ -158,7 +158,8 @@ async function onYoutubeSearch() {
                 'q': q,
                 'part': 'snippet',
                 'maxResults': 20,
-                'type': 'video'
+                'type': 'video',
+                'videoCaption': $("#chk-cc").is(':checked') ? 'closedCaption' : 'any'
             }
         });
         let resp = request.result;
