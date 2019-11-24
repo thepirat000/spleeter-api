@@ -109,8 +109,6 @@ namespace SpleeterAPI.Controllers
                         break;
                     }
                 }
-                
-                
             }
 
             if (extension == "zip" || extension == "mp3")

@@ -90,7 +90,7 @@ namespace SpleeterAPI.Youtube
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}"" ";
             var embedSubs = includeSubtitles ? "--write-sub --embed-subs " : "";
-            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 50M {userPassParams}-o ""{fileName}"" {embedSubs}""https://youtu.be/{vid}""";
+            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 100M {userPassParams}-o ""{fileName}"" {embedSubs}""https://youtu.be/{vid}""";
 
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
