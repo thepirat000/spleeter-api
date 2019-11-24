@@ -39,7 +39,7 @@ namespace SpleeterAPI.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<ProcessResponse>> Process([FromForm] string format, [FromForm] bool includeHf)
         {
-            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
+            if (format != "2stems" && format != "4stems" && format != "5stems")
             {
                 return BadRequest("Format must be '2stems', '4stems' or '5stems'");
             }
@@ -62,18 +62,6 @@ namespace SpleeterAPI.Controllers
                 if (startedSecondsAgo < 1800)
                 {
                     return new ProcessResponse() { Error = $"File {archiveName} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
-                }
-            }
-
-            if (format == "karaoke" || format == "vocals")
-            {
-                if (Request.Form.Files.Count == 1)
-                {
-                    var mp3File = $"{Output_Root}/{archiveName}.mp3";
-                    if (System.IO.File.Exists(mp3File))
-                    {
-                        return new ProcessResponse() { FileId = $"{archiveName}.mp3" };
-                    }
                 }
             }
 
@@ -122,30 +110,6 @@ namespace SpleeterAPI.Controllers
             {
                 _processing.TryRemove(archiveName, out _);
                 return Problem($"spleeter separate command exited with code {separateResult.ExitCode}\nMessages: {separateResult.Output}.");
-            }
-
-            // 2.1 If karaoke
-            if (format == "karaoke" || format == "vocals")
-            {
-                // 2.1.1 If just 1 file -> copy to output renaming as karaoke and return mp3 file name
-                if (inputFilenames.Count == 1)
-                {
-                    var fileToCopy = format == "karaoke" ? "accompaniment.mp3" : "vocals.mp3";
-                    System.IO.File.Copy($"{Output_Root}/{archiveName}/{Path.GetFileNameWithoutExtension(inputFilenames[0])}/{fileToCopy}", $"{Output_Root}/{archiveName}.mp3", true);
-                    Directory.Delete($"{Output_Root}/{archiveName}", true);
-                    Directory.Delete(inputFolder, true);
-                    _processing.TryRemove(archiveName, out _);
-                    return new ProcessResponse() { FileId = $"{archiveName}.mp3" };
-                } 
-                else
-                {
-                    // More than 1 karaoke -> remove all the vocals.mp3
-                    var fileToRemove = format == "karaoke" ? "vocals.mp3" : "accompaniment.mp3";
-                    foreach (var file in Directory.EnumerateFiles($"{Output_Root}/{archiveName}", fileToRemove, SearchOption.AllDirectories))
-                    {
-                        System.IO.File.Delete(file);
-                    }
-                }
             }
 
             // 3. Zip the output folder
