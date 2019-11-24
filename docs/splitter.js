@@ -2,8 +2,6 @@ var buttonSplit = $("#btn-split");
 var buttonSearch = $("#btn-search");
 var max_duration_mins = 30;
 
-//var split_yt_api = 'https://spleeter.eastus.cloudapp.azure.com/yt';
-//var split_mp3_api = 'https://spleeter.eastus.cloudapp.azure.com/mp3'; 
 //var split_yt_api = 'https://localhost:5001/yt';
 //var split_mp3_api = 'https://localhost:5001/mp3'; 
 
@@ -368,7 +366,7 @@ function onFileSplitCompleted(f, response) {
         alert(response.error);
     } else {
         // download file
-        console.log("Successful split " + response.fileId);
+        console.log("Successful split: " + JSON.stringify(response));
         let downloadUrl = split_mp3_api + "/d?fn=" + encodeURIComponent(response.fileId);
         window.open(downloadUrl);
     }
@@ -376,9 +374,13 @@ function onFileSplitCompleted(f, response) {
 
 function onYoutubeSplit() {
     let vid = validateUrl();
+    if (!vid) {
+        return;
+    }
     let format = $("#type").val();
     if (vid === null || format === null) {
         alert("Please select a video and format");
+        return;
     }
     startWait();
     setCookie('spleeter_format', format, 30);
@@ -401,7 +403,7 @@ function split(vid, format) {
             if (data.error) {
                 alert(data.error);
             } else {
-                console.log("Successful split " + data.fileId);
+                console.log("Successful split: " + JSON.stringify(data));
                 let downloadUrl = split_yt_api + "/d/" + format + "/" + vid + queryString;
                 window.open(downloadUrl);
             }

@@ -39,7 +39,7 @@ namespace SpleeterAPI.Controllers
         public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
             format = FixFormat(format, out string extension);
-
+            
             // Get video title and duration
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds == 0)

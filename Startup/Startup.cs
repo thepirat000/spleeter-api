@@ -42,7 +42,11 @@ namespace SpleeterAPI
                 services.AddCors();
             }
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(json => {
+                    json.JsonSerializerOptions.IgnoreNullValues = true;
+                    json.JsonSerializerOptions.WriteIndented = true;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

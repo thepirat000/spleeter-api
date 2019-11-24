@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using System.IO;
-using Microsoft.Extensions.Logging;
-using System.Runtime.InteropServices;
 
 namespace SpleeterAPI
 {
