@@ -49,7 +49,6 @@ $(document).ready(function () {
         window.open(downloadUrl);
     }
 
-
     makeTabs();
     setupDropFilesBox();
 
@@ -133,13 +132,13 @@ function makeTabs() {
         let isYoutube = $("#tab1").is(":visible");
         if (isYoutube) {
             $("#div-chk-o").show();
-            $('#type option[data-ext="mp4"]').show();
+            $('#type option[data-ext="mp3"],[data-ext="mp4"]').show();
         } else {
             $("#div-chk-o").hide();
-            $('#type option[data-ext="mp4"]').hide();
-            if ($('#type option[data-ext="mp4"]:selected').length)
+            $('#type option[data-ext="mp3"],[data-ext="mp4"]').hide();
+            if ($('#type option[data-ext="mp3"],[data-ext="mp4"]:selected').length)
             {
-                $('#type').val("karaoke");
+                $('#type').val("2stems");
             }
         }
 
