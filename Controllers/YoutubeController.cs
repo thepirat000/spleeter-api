@@ -39,7 +39,7 @@ namespace SpleeterAPI.Controllers
         public ActionResult<ProcessResponse> Process([FromRoute] string format, [FromRoute] string vid, [FromQuery] bool hf = false)
         {
             format = FixFormat(format, out string extension);
-            
+
             // Get video title and duration
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds == 0)
@@ -198,6 +198,23 @@ namespace SpleeterAPI.Controllers
                 return PhysicalFile(outFile, contentType, $"{fileId}.{extension}");
             }
             return Problem($"File {fileId} not found");
+        }
+
+        [HttpGet("dd/{vid}")]
+        [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = false)]
+        public ActionResult DirectDownload([FromRoute] string vid)
+        {
+            var info = YoutubeHelper.GetVideoInfo(vid);
+            if (info.DurationSeconds > (Max_Duration_Seconds * 2))
+            {
+                return BadRequest($"Cannot process videos longer than {Max_Duration_Seconds * 2} seconds");
+            }
+            var video = YoutubeHelper.DownloadVideo(vid, true);
+            if (System.IO.File.Exists(video.VideoFileFullPath))
+            {
+                return PhysicalFile(video.VideoFileFullPath, "video/mp4", $"{System.IO.Path.GetFileName(video.VideoFileFullPath)}");
+            }
+            return BadRequest("Video requested was not found");
         }
 
         private string GetArchiveName(string title, string format, bool includeHighFreq, bool isVideo)

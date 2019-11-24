@@ -43,6 +43,13 @@ window.OnLoadCallback = () => {
 };
 
 $(document).ready(function () {
+    let directDownloadVid = new URLSearchParams(window.location.search).get('d');
+    if (directDownloadVid) {
+        let downloadUrl = split_yt_api + "/dd/" + directDownloadVid;
+        window.open(downloadUrl);
+    }
+
+
     makeTabs();
     setupDropFilesBox();
 
