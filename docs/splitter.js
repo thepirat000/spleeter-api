@@ -438,6 +438,7 @@ function split(vid, format) {
     let processUrl = split_yt_api + "/p";
     let subFormats = $("#div-stems input:visible").filter(":checked").map(function () { return this.value; }).get();
     if (subFormats.length === 0) {
+        stopWait();
         alert("Must select at least one stem");
         return;
     }
