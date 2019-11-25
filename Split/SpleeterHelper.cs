@@ -1,20 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System;
 
 namespace SpleeterAPI.Youtube
 {
 
     public static class SpliterHelper
     {
-        public static SplitProcessStatus Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
+        private static Lazy<ISplitterAdapter> _cmdAdapter = new Lazy<ISplitterAdapter>(() => new SplitterCmdAdapter());
+        private static Lazy<ISplitterAdapter> _bashAdapter = new Lazy<ISplitterAdapter>(() => new SplitterBashAdapter());
+
+        public static SplitProcessResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
             bool isWindows = Startup.IsWindows;
-            ISplitterAdapter adapter = isWindows ? (ISplitterAdapter)new SplitterCmdAdapter() : new SplitterBashAdapter();
+            ISplitterAdapter adapter = isWindows ? _cmdAdapter.Value : _bashAdapter.Value;
             return adapter?.Split(inputFile, outputFolder, format, includeHighFreq, isBatch);
+        }
+
+        public static SplitProcessResult Split(string inputFile, string outputFolder, YoutubeProcessRequest request, bool isBatch = false)
+        {
+            bool isWindows = Startup.IsWindows;
+            ISplitterAdapter adapter = isWindows ? _cmdAdapter.Value : _bashAdapter.Value;
+            return adapter?.Split(inputFile, request, outputFolder, isBatch);
         }
 
     }

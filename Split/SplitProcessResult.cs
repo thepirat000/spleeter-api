@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SpleeterAPI.Youtube
 {
-    public class SplitProcessStatus
+    public class SplitProcessResult
     {
         public int ExitCode { get; set; }
         public int ErrorCount { get; set; }

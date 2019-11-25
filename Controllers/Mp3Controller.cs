@@ -25,6 +25,7 @@ namespace SpleeterAPI.Controllers
     [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = true)]
     public class Mp3Controller : ControllerBase
     {
+        private static string Input_Root = Startup.Configuration["Spleeter:InputFolder"];
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private static long Max_Upload_Size = long.Parse(Startup.Configuration["Mp3:MaxUploadSize"]);
         private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
@@ -73,7 +74,7 @@ namespace SpleeterAPI.Controllers
 
             _processing[archiveName] = now;
 
-            var inputFolder = $"/input/{archiveName}";
+            var inputFolder = $"{Input_Root}/{archiveName}";
             if (!Directory.Exists(inputFolder))
             {
                 Directory.CreateDirectory(inputFolder);

@@ -4,7 +4,7 @@
     public class SplitterBashAdapter : ISplitterAdapter
     {
         private static string Max_Duration = Startup.Configuration["Spleeter:MaxDuration"];
-        public SplitProcessStatus Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
+        public SplitProcessResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
             if (format == "karaoke" || format == "vocals")
             {
@@ -25,7 +25,7 @@
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
             cmd = $"python -m spleeter separate {inputParam} -o \"{outputFolder}\" {maxDurationParam} {formatParam} -c mp3";
             var result = ShellHelper.Execute(cmd);
-            return new SplitProcessStatus()
+            return new SplitProcessResult()
             {
                 ErrorCount = 0,
                 ExitCode = result.ExitCode,
@@ -33,6 +33,11 @@
             };
         }
 
+        // TODO:
+        public SplitProcessResult Split(string inputFile, YoutubeProcessRequest request, string outputFolder, bool isBatch = false)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
 

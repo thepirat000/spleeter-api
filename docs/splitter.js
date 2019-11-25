@@ -50,12 +50,13 @@ $(document).ready(function () {
     makeTabs();
     setupDropFilesBox();
 
-    let formatConfig = getCookie('spleeter_format');
-    if (formatConfig) {
-        $("#type").val(formatConfig);
-    }
-    let hfConfig = getCookie('spleeter_hf');
-    $("#chk-hf").prop('checked', hfConfig === 'true');
+    $("#type").on('change', function () {
+        let format = $(this).val();
+        $("#div-stems div:not(._" + format + ")").hide();
+        $("#div-stems div._" + format).show();
+    });
+
+    setInputsFromCookie();
 
     $("#btn-close-wait").on("click", function () {
         stopWait();
@@ -110,7 +111,49 @@ $(document).ready(function () {
             return false;
         }
     });
+
+    $("#type").change();
+    $("#div-stems").show();
 });
+
+function setInputsFromCookie() {
+    let formatConfig = getCookie('spleeter_format');
+    if (formatConfig) {
+        $("#type").val(formatConfig);
+    } else {
+        $("#type").val("4stems");
+    }
+
+    let hfConfig = getCookie('spleeter_hf');
+    $("#chk-hf").prop('checked', hfConfig === 'true');
+
+    let stemsConfig = getCookie('spleeter_stems');
+    if (stemsConfig) {
+        $("#div-stems input").prop('checked', false);
+        stemsConfig.split(',').forEach(stem => $("#div-stems input#toggle-" + stem).prop('checked', true));
+    }
+
+    let outputConfig = getCookie('spleeter_output');
+    $("input#rad-" + outputConfig).prop('checked', true);
+}
+
+function setCookieFromInput() {
+    let format = $("#type").val();
+    setCookie('spleeter_format', format, 30);
+    setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+
+    var stems = [];
+    $("#div-stems input").filter(":checked").each(function () {
+        stems.push(this.value);
+    });
+    setCookie('spleeter_stems', stems.join(','));
+
+    let extension = $("input[name='output-type']:checked").val();
+    if (extension) {
+        setCookie('spleeter_output', extension.slice(1));
+    }
+    
+}
 
 function makeTabs() {
     // Show the first tab and hide the rest
@@ -129,15 +172,11 @@ function makeTabs() {
 
         let isYoutube = $("#tab1").is(":visible");
         if (isYoutube) {
-            $("#div-chk-o").show();
-            $('#type option[data-ext="mp3"],[data-ext="mp4"]').show();
+            $("#container-stems").show();
+            $("#container-output").show();
         } else {
-            $("#div-chk-o").hide();
-            $('#type option[data-ext="mp3"],[data-ext="mp4"]').hide();
-            if ($('#type option[data-ext="mp3"],[data-ext="mp4"]:selected').length)
-            {
-                $('#type').val("2stems");
-            }
+            $("#container-stems").hide();
+            $("#container-output").hide();
         }
 
         return false;
@@ -291,6 +330,7 @@ function stopWait() {
     $("#div-main").find("*").removeClass('wait');
     $("#duration").hide();
     $.modal.close();
+    $("#wait-dialog").hide();
 }
 
 function setCookie(name, value, days) {
@@ -351,9 +391,8 @@ function onFileSplit() {
     $("#file-hf").val($("#chk-hf").is(':checked'));
 
     startWait();
-    
-    setCookie('spleeter_format', format, 30);
-    setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+
+    setCookieFromInput();
 
     dzError = false;
     dropzone.processQueue(); 
@@ -383,34 +422,56 @@ function onYoutubeSplit() {
         return;
     }
     startWait();
-    setCookie('spleeter_format', format, 30);
-    setCookie('spleeter_hf', $("#chk-hf").is(':checked') ? 'true' : 'false', 30);
+
+    setCookieFromInput();
 
     // Split !
     split(vid, format);
 }
+
 // Send youtube video to process
 function split(vid, format) {
-    let queryString = "?hf=" + $("#chk-hf").is(':checked');
-    let processUrl = split_yt_api + "/p/" + format + "/" + vid + queryString;
+    let processUrl = split_yt_api + "/p";
+    let subFormats = $("#div-stems input:visible").filter(":checked").map(function () { return this.value; }).get();
+    if (subFormats.length === 0) {
+        alert("Must select at least one stem");
+        return;
+    }
+    let extension = $("input[name='output-type']:checked").val();
+    if (!extension) {
+        extension = ".zip";
+    }
+    let includeHf = $("#chk-hf").is(':checked');
     $("#btn-split").blur();
 
     $.ajax({
         url: processUrl,
-        type: 'GET',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            vid: vid,
+            baseFormat: $("#type").val(),
+            subFormats: subFormats,
+            extension: extension,
+            options: {
+                includeHighFrequencies: includeHf
+            }
+        }),
         success: function (data) {
             stopWait();
             if (data.error) {
                 alert(data.error);
             } else {
                 console.log("Successful split: " + JSON.stringify(data));
+                let queryString = "?sub=" + subFormats.join(',') + "&ext=" + extension + "&hf=" + includeHf;
                 let downloadUrl = split_yt_api + "/d/" + format + "/" + vid + queryString;
                 window.open(downloadUrl);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
             stopWait();
-            alert("Error processing " + vid + ":\n" + textStatus);
+            alert("Error processing " + vid + ":\n" + (jqXHR.responseText ? jqXHR.responseText : textStatus));
         }
     });
 }

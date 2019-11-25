@@ -28,91 +28,144 @@
 </head>
 <body>
     <div id="big-one" style="max-width: 640px; margin: 0 auto;">
-        <div style="font-size: large; color: #08E; text-align: center; padding: 0em;">
-            <p style="margin: 0 auto; margin-left: 10%;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p>
-        </div>
         <div class="banner-message">
-            <span class="section-title">Options</span>
-            <div id="options">
-                <div style="font-size: small;">
-                    <div>
-                        <input type="checkbox" id="chk-hf" value="hf"> <label style="font-size: 17px;" for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
+
+
+            <div class="app-title" >
+                <p style="margin: 0 auto; margin-left: 10%; padding: 7px 0px 3px 0px;">Audio Splitter <sup style="font-size: xx-small;">powered by <a href="https://github.com/deezer/spleeter">Deezer Research Spleeter</a></sup></p>
+            </div>
+
+
+            <div id="div-config">
+                <div>
+                    <span class="section-title">Mode</span>
+                    <select id='type' title="Type">
+                        <option value='2stems'>2 stems (Vocals + Karaoke)</option>
+                        <option value='4stems' selected>4 stems (Bass, Drums, Vocals, Other)</option>
+                        <option value='5stems'>5 stems (Piano, Bass, Drums, Vocals, Other)</option>
+                    </select>
+                </div>
+                <div id="container-stems">
+                    <br />
+                    <span class="section-title">Include stems</span>
+                    <div id="div-stems" style="display:none; background-color: #EEEEEE;">
+                        <div class="_2stems">
+                            <input id="toggle-accompaniment" value="accompaniment" type="checkbox" checked>
+                            <label for="toggle-accompaniment">Accompaniment</label>
+                        </div>
+                        <div class="_4stems _5stems">
+                            <input id="toggle-bass" value="bass" type="checkbox" checked>
+                            <label for="toggle-bass">Bass</label>
+                        </div>
+                        <div class="_4stems _5stems">
+                            <input id="toggle-drums" value="drums" type="checkbox" checked>
+                            <label for="toggle-drums">Drums</label>
+                        </div>
+                        <div class="_4stems _5stems">
+                            <input id="toggle-other" value="other" type="checkbox" checked>
+                            <label for="toggle-other">Other</label>
+                        </div>
+                        <div class="_5stems">
+                            <input id="toggle-piano" value="piano" type="checkbox" checked>
+                            <label for="toggle-piano">Piano</label>
+                        </div>
+                        <div class="_2stems _4stems _5stems">
+                            <input id="toggle-vocals" value="vocals" type="checkbox" checked>
+                            <label for="toggle-vocals">Vocals</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <br />
-            <span class="section-title">Mode</span>
-            <select id='type' title="Type">
-                <option value='karaoke' data-ext="mp3" selected>Audio - Karaoke</option>
-                <option value='vocals' data-ext="mp3">Audio - Vocals</option>
-                <option value='2stems' data-ext="zip">Audio - 2 stems (Vocals + Karaoke)</option>
-                <option value='4stems' data-ext="zip">Audio - 4 stems (Bass, Drums, Vocals, Other)</option>
-                <option value='5stems' data-ext="zip">Audio - 5 stems (Piano, Bass, Drums, Vocals, Other)</option>
-                <option value='karaoke_v' data-ext="mp4">Video - Karaoke</option>
-                <option value='vocals_v' data-ext="mp4">Video - Vocals</option>
-            </select>
-        </div>
-
-        <div class="tabs">
-            <ul id="tabs-nav">
-                <li><a href="#tab1">YouTube</a></li>
-                <li><a href="#tab2">File</a></li>
-            </ul>
-
-            <div id="tabs-content">
-                <div id="tab1" class="tab-content">
-                    <div id="div-search" style="display:none;" class="banner-message">
+                <div id="container-options">
+                    <br />
+                    <span class="section-title">Options</span>
+                    <div id="options">
                         <div>
-                            <div style="margin-bottom: 7px;">
-                                <input type="checkbox" id="chk-cc" value="cc"> <label style="font-size: 17px;" for="chk-cc" title="Check to only include videos with closed captions (subtitles) on the search">Only videos with subtitles</label>
+                            <div>
+                                <input type="checkbox" id="chk-hf" value="hf"> <label for="chk-hf" title="Check to include an average of the high frequencies (>11khz)">Include high frequencies</label>
                             </div>
-                            <input id="search" class="search" autocapitalize="none" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
-                            <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
                         </div>
-                        <div id="search-results">
-
-                        </div>
-                    </div>
-                    <hr />
-                    <div id="div-main" class="banner-message">
-                        <div>
-                            <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center; width:100%;" />
-                        </div>
-                        <div id="duration"></div>
                     </div>
                 </div>
-
-                <div id="tab2" class="tab-content">
-                    <div class="banner-message">
-                        <div class="dropzone-container">
-                            <form id="uploader" class="dropzone-drop-area">
-                                <input type="hidden" name="includeHf" id="file-hf" />
-                                <input type="hidden" name="format" id="file-format" />
-                            </form>
+                <div id="container-output">
+                    <br />
+                    <span class="section-title">Output type</span>
+                    <div class="output-type">
+                        <div style="display: block;">
+                            <input id="rad-zip" name="output-type" type="radio" value=".zip" checked>
+                            <label for="rad-zip">Separated audio stems (.zip)</label>
+                        </div>
+                        <div style="display: block;">
+                            <input id="rad-mp3" name="output-type" value=".mp3" type="radio">
+                            <label for="rad-mp3">Single audio mix (.mp3)</label>
+                        </div>
+                        <div style="display: block;">
+                            <input id="rad-mp4" name="output-type" value=".mp4" type="radio">
+                            <label for="rad-mp4">Video + audio mix (.mp4)</label>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="tabs">
+                <ul id="tabs-nav">
+                    <li><a href="#tab1">YouTube</a></li>
+                    <li><a href="#tab2">File</a></li>
+                </ul>
 
-        <div>
-            <div><button id="btn-split" class="split-button">Split</button></div>
-        </div>
+                <div id="tabs-content">
+                    <div id="tab1" class="tab-content">
+                        <div id="div-search" style="display:none;" class="banner-message">
+                            <div>
+                                <div style="margin-bottom: 7px;">
+                                    <input type="checkbox" id="chk-cc" value="cc"> <label style="font-size: 17px;" for="chk-cc" title="Check to only include videos with closed captions (subtitles) on the search">Only videos with subtitles</label>
+                                </div>
+                                <input id="search" class="search" autocapitalize="none" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
+                                <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                            <div id="search-results">
 
-        <div id="wait-dialog" class="modal">
-            <div class="loader" id="spinner" style="display:none;"></div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div id="div-main" class="banner-message">
+                            <div>
+                                <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center; width:100%;" />
+                            </div>
+                            <div id="duration"></div>
+                        </div>
+                    </div>
+
+                    <div id="tab2" class="tab-content">
+                        <div class="banner-message">
+                            <div class="dropzone-container">
+                                <form id="uploader" class="dropzone-drop-area">
+                                    <input type="hidden" name="includeHf" id="file-hf" />
+                                    <input type="hidden" name="format" id="file-format" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
-                Processing. Please wait a few minutes...
+                <div><button id="btn-split" class="split-button">Split</button></div>
             </div>
-            <button id="btn-close-wait">Close</button>
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
+                </div>
+            </footer>
+
         </div>
+    </div>
 
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                <p>&copy; 2019 ThePirat - <a href="https://github.com/thepirat000/spleeter-api">Source code</a> - Powered by <a href="https://github.com/deezer/spleeter">Deezer's Spleeter</a></p>
-            </div>
-        </footer>
-
+    <div id="wait-dialog" class="modal">
+        <div class="loader" id="spinner" style="display:none;"></div>
+        <div>
+            Processing. Please wait a few minutes...
+        </div>
+        <button id="btn-close-wait">Close</button>
     </div>
 
     <script type="text/javascript" src="splitter.js"></script>

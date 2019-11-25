@@ -141,11 +141,20 @@ ul#tabs-nav li.active {
     width: 100%;
     border: 1px solid #ccc;
     text-align-last: center;
+    background-color: #EEE;
+    font-size: small;
+}
+
+#div-stems label,
+#div-stems input,
+#options label,
+#options input {
+    vertical-align: middle;
+    font-size: small;
 }
 
 .section-title {
     font-weight: bold;
-    font-size: 18px;
 }
 
 .search {
@@ -182,13 +191,38 @@ select {
     height: 34px;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background: url(https://www.deezer.com/favicon.ico) 96% / 5% no-repeat #EEE;
+    background: url(down-arrow.svg) right/35px 15px no-repeat,url(down-arrow.svg) left/35px 15px no-repeat;
 }
 
-#uploader, #options {
-    padding: 10px 0px 10px 0px;
+#uploader, #options, #div-stems {
+    padding: 5px 0px 5px 0px;
     font-size: 17px;
     width: 80%;
     background: #f1f1f1;
     margin: 0 auto;
+}
+
+._2stems, ._4stems, ._5stems {
+    display: inline;
+    white-space: nowrap;
+}
+
+.output-type div {
+    background-color: #EEEEEE;
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 2px 0px 2px 0px;
+}
+
+#div-config {
+    border: 5px solid #09F;
+    padding: 5px;
+}
+
+.app-title {
+    font-size: large;
+    color: white;
+    text-align: center;
+    padding: 0em;
+    background-color: #08E;
 }

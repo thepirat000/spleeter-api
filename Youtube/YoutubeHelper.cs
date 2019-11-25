@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SpleeterAPI.Youtube
 {
@@ -10,7 +11,16 @@ namespace SpleeterAPI.Youtube
         private static string Youtube_User = Startup.Configuration["Youtube:User"];
         private static string Youtube_Pass = Startup.Configuration["Youtube:Pass"];
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
+        private static string Cache_Root = Startup.Configuration["Spleeter:CacheFolder"];
         private static ConcurrentDictionary<string, YoutubeVideoInfo> _videoInfoCache = new ConcurrentDictionary<string, YoutubeVideoInfo>();
+
+        public static Dictionary<string, string[]> FormatMapSub { get; } = new Dictionary<string, string[]>()
+        {
+            { "2stems", new [] { "accompaniment", "vocals" } },
+            { "4stems", new [] { "bass", "drums", "other", "vocals" } },
+            { "5stems", new [] { "bass", "drums", "other", "piano", "vocals" } }
+        };
+        public static Regex ValidVidRegex { get; } = new Regex(@"^[a-zA-Z0-9_-]{11}$");
 
         public static YoutubeVideoInfo GetVideoInfo(string vid)
         {
@@ -55,7 +65,7 @@ namespace SpleeterAPI.Youtube
             return info;
         }
 
-        public static YoutubeAudioResponse DownloadAudio(string vid, string fileId)
+        public static YoutubeAudioResponse DownloadAudio(string vid)
         {
             var fileName = GetAudioFilename(vid);
             var result = new YoutubeAudioResponse();
@@ -113,12 +123,12 @@ namespace SpleeterAPI.Youtube
 
         private static string GetAudioFilename(string vid)
         {
-            return $"{Output_Root}/download.audio/{vid}";
+            return $"{Cache_Root}/yt/download.audio/{vid}";
         }
 
         private static string GetVideoFilename(string vid)
         {
-            return $"{Output_Root}/download.audio/{vid}.mp4";
+            return $"{Cache_Root}/yt/download.video/{vid}.mp4";
         }
     }
 }
