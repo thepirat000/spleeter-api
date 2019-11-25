@@ -141,7 +141,7 @@ namespace SpleeterAPI.Youtube
 
                 if (audioFilepath != null)
                 {
-                    var cmd = $"ffmpeg -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -c:s mov_text -map 0:v:0 -map 1:a:0 -map 0:s:0? \"{outputFilePath}\"";
+                    var cmd = $"ffmpeg -y -i \"{video.VideoFileFullPath}\" -i \"{audioFilepath}\" -c:v copy -c:s mov_text -map 0:v:0 -map 1:a:0 -map 0:s:0? \"{outputFilePath}\"";
                     var shellResult = ShellHelper.Execute(cmd);
                     if (shellResult.ExitCode != 0)
                     {
@@ -209,10 +209,15 @@ namespace SpleeterAPI.Youtube
 
         private void MergeMp3(string outputFilePath, IEnumerable<StemFileInfo> stemFilesToMerge)
         {
+            if (File.Exists(outputFilePath))
+            {
+                _logger.LogInformation("Merged mp3 cache hit");
+                return;
+            }
             var inputParams = stemFilesToMerge
                     .Select(sf => $"-i \"{sf.FilePath}\"")
                     .ToList();
-            var mergeCmd = $"ffmpeg {string.Join(' ', inputParams)} -filter_complex \"[0:0][1:0] amix=inputs={inputParams.Count}:duration=longest\" \"{outputFilePath}\"";
+            var mergeCmd = $"ffmpeg -y {string.Join(' ', inputParams)} -filter_complex \"[0:0][1:0] amix=inputs={inputParams.Count}:duration=longest\" \"{outputFilePath}\"";
             var shellResult = ShellHelper.Execute(mergeCmd);
             if  (shellResult.ExitCode != 0)
             {

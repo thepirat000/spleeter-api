@@ -119,7 +119,11 @@ $(document).ready(function () {
 function setInputsFromCookie() {
     let formatConfig = getCookie('spleeter_format');
     if (formatConfig) {
-        $("#type").val(formatConfig);
+        if (formatConfig.endsWith("stems")) {
+            $("#type").val(formatConfig);
+        } else {
+            $("#type").val("4stems");
+        }
     } else {
         $("#type").val("4stems");
     }
