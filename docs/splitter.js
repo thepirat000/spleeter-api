@@ -1,5 +1,5 @@
 var buttonSplit = $("#btn-split");
-var buttonSearch = $("#btn-search");
+
 var max_duration_mins = 30;
 
 //var split_yt_api = 'https://localhost:5001/yt';
@@ -30,12 +30,15 @@ window.OnLoadCallback = () => {
             $("#div-search").hide();
             return;
         }
-        let dc = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", k).toString(CryptoJS.enc.Utf8);
-        if (dc.startsWith('AIza')) {
-            k = dc;
+        try {
+            let dc = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", k).toString(CryptoJS.enc.Utf8);
+            if (dc.startsWith('AIza')) {
+                k = dc;
+            }
+        } finally {
+            gapi.client.setApiKey(k);
+            setCookie("spleeter_gapikey", k);
         }
-        gapi.client.setApiKey(k);
-        setCookie("spleeter_gapikey", k);
     }
     $("#div-search").show();
 };
@@ -66,7 +69,7 @@ $(document).ready(function () {
     buttonSplit.on("click", onSplit);
 
     // handle Search click 
-    buttonSearch.on("click", onYoutubeSearch);
+    $("#btn-search").on("click", onYoutubeSearch);
 
     $(document).on('mouseenter', '.clickable, .file-clickable', function () {
         $(this).css("opacity", ".5");
@@ -80,6 +83,7 @@ $(document).ready(function () {
         let vid = $(this).attr('title');
         if (vid) {
             $("#url").val(vid);
+            $("#accordion").accordion("option", "active", false);
             $("#btn-split").focus();
             getYoutubeVideoDuration(vid, function (dur, title) {
                 $("#duration").text(dur);
@@ -228,6 +232,10 @@ async function onYoutubeSearch() {
                 //$('#search-results').append('<iframe width="105" height="79" src="//www.youtube.com/embed/'+ resp.items[i].id.videoId +'" frameborder="0" allowfullscreen></iframe>');    
             }
         }
+        $('#search-results').css('height', '');
+        $('#search-results').show();
+        $('#search-section').show();
+        $("#accordion").accordion({ collapsible: true, header: "#accordion-header", active: 0 });
     } catch (e) {
         if (e.result.error.errors[0].reason === "keyInvalid") {
             removeCookie("spleeter_gapikey");
@@ -479,4 +487,22 @@ function split(vid, format) {
             alert("Error processing " + vid + ":\n" + (jqXHR.responseText ? jqXHR.responseText : textStatus));
         }
     });
+}
+
+function presetClick(preset) {
+    if (preset === "audio-karaoke") {
+        $("#type").val("2stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', false);
+        $("#div-stems input#toggle-accompaniment").prop('checked', true);
+        $("input#rad-mp3").prop('checked', true);
+    }
+    else if (preset === "video-karaoke") {
+        $("#type").val("2stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', false);
+        $("#div-stems input#toggle-accompaniment").prop('checked', true);
+        $("input#rad-mp4").prop('checked', true);
+    }
+    return false;
 }

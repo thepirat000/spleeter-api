@@ -38,6 +38,12 @@
 
 
             <div id="div-config">
+                <div id="presets-section">
+                    <span style="font-weight: bold;" >Presets: </span>
+                    <a href="Video-Karaoke" onclick="return presetClick('audio-karaoke');">Audio Karaoke</a>
+                    |
+                    <a href="Audio-Karaoke" onclick="return presetClick('video-karaoke');">Video Karaoke</a>
+                </div>
                 <div>
                     <span class="section-title">Mode</span>
                     <select id='type' title="Type">
@@ -119,11 +125,18 @@
                                 <div style="margin-bottom: 7px;">
                                     <input type="checkbox" id="chk-cc" value="cc"> <label style="font-size: 17px;" for="chk-cc" title="Check to only include videos with closed captions (subtitles) on the search">Only videos with subtitles</label>
                                 </div>
-                                <input id="search" class="search" autocapitalize="none" autocorrect="off" name="search_query" tabindex="0" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
-                                <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
+                                <div id="input-search-section">
+                                    <input id="search" class="search" autocapitalize="none" autocomplete="on" name="search_query" type="text" spellcheck="false" placeholder="YouTube Search" style="outline: none; text-align: center;">
+                                    <button id="btn-search" type="submit"><i class="fa fa-search"></i></button>
+                                </div>
                             </div>
-                            <div id="search-results">
+                            <div id="search-section" style="display:none;">
+                                <div id="accordion">
+                                    <div id="accordion-header">Search results</div>
+                                    <div id="search-results">
 
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <hr />

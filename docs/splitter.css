@@ -161,21 +161,21 @@ ul#tabs-nav li.active {
     padding: 10px 0px 10px 0px;
     font-size: 17px;
     border: 1px solid grey;
-    width: 80%;
+    width: 100%;
     background: #f1f1f1;
     margin: 0 auto;
 }
+
 #btn-search {
     margin: 0 auto;
-    max-width: 64px;
+    max-width: 50px;
     min-width: 42px;
-    width: 15%;
+    width: 100%;
     padding: 10px 0px 10px 0px;
     background: #2196F3;
     color: white;
     font-size: 17px;
     border: 1px solid grey;
-    border-left: none; /* Prevent double borders */
     cursor: pointer;
 }
 
@@ -230,7 +230,7 @@ select {
 #search-results {
     max-height: 340px;
     overflow: auto;
-    margin: 10px 0px 0px 0px;
+    margin: 0 auto;
     border: solid 1px #08E;
 }
 
@@ -257,4 +257,27 @@ select {
 
 #video-info {
     padding-top: 10px;
+}
+
+.ui-accordion .ui-accordion-header {
+    padding: 0;
+}
+
+#accordion-header {
+    padding-right: 50px;
+}
+
+#input-search-section {
+    display: flex;
+}
+
+#presets-section {
+    font-size: x-small;
+    border: 1px solid #08E;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+#presets-section a {
+    padding: 0px 4px 0px 4px;
 }
