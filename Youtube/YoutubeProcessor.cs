@@ -52,6 +52,7 @@ namespace SpleeterAPI.Youtube
             var audio = YoutubeHelper.DownloadAudio(request.Vid);
 
             // 3. Split
+            var sw = Stopwatch.StartNew();
             var splitOutputFolder = GetAudioSplitOutputFolder(request);
             int fileCount = Directory.Exists(splitOutputFolder) ? Directory.GetFiles(splitOutputFolder, "*.mp3", SearchOption.AllDirectories).Length : 0;
             if (fileCount == int.Parse(request.BaseFormat.Substring(0, 1)))
@@ -65,7 +66,6 @@ namespace SpleeterAPI.Youtube
                     _logger.LogInformation($"Deleting folder {splitOutputFolder}");
                     Directory.Delete(splitOutputFolder, true);
                 }
-                var sw = Stopwatch.StartNew();
                 var splitResult = SpliterHelper.Split(audio.AudioFileFullPath, splitOutputFolder, request, isBatch: false);
                 _logger.LogInformation($"Separation for {request.Vid}: {(splitResult.ExitCode == 0 ? "Successful" : "Failed")}\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
                 if (splitResult.ExitCode != 0)
@@ -73,11 +73,17 @@ namespace SpleeterAPI.Youtube
                     return new ProcessResponse() { Error = $"spleeter separate command exited with code {splitResult.ExitCode}\nMessages: {splitResult.Output}." };
                 }
             }
+            sw.Stop();
 
             // 4. Make output
             MakeOutput(audio.AudioFileFullPath, outputFilePath, splitOutputFolder, request);
 
-            return new ProcessResponse() { FileId = outputFilename };
+            return new ProcessResponse()              
+            {
+                FileId = outputFilename,	
+                Speed = sw.Elapsed.TotalSeconds == 0 ? null : $"{info.DurationSeconds / sw.Elapsed.TotalSeconds:N1}x",	
+                TotalTime = sw.Elapsed.ToString("hh\\:mm\\:ss")
+            };
         }
 
         /// <summary>

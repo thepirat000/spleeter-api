@@ -105,6 +105,7 @@ namespace SpleeterAPI.Controllers
             var sw = Stopwatch.StartNew();
             var inputFileParam = string.Join(' ', inputFilenames.Select(fn => $"\"{inputFolder}/{fn}\""));
             var separateResult = SpliterHelper.Split(inputFileParam,  $"{Output_Root}/{archiveName}", format, includeHf, isBatch: true);
+            sw.Stop();
             _logger.LogInformation($"Separation for {inputFilenames.Count} files:\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
 
             if (separateResult.ExitCode != 0)
@@ -122,9 +123,10 @@ namespace SpleeterAPI.Controllers
             
             _processing.TryRemove(archiveName, out _);
 
-            return new ProcessResponse() 
-            { 
-                FileId = $"{archiveName}.zip"
+            return new ProcessResponse()
+            {
+                FileId = $"{archiveName}.zip",
+                TotalTime = sw.Elapsed.ToString("hh\\:mm\\:ss")
             };
         }
 
