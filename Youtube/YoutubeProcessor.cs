@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+
 
 namespace SpleeterAPI.Youtube
 {
@@ -44,7 +46,7 @@ namespace SpleeterAPI.Youtube
                 return new ProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
             }
 
-            _logger.LogInformation($"=== YouTube Process ===\nVid: {info.Filename}\nTitle: {info.Filename}\nDuration: {info.Duration}\n");
+            LogStart(request, info);
 
             // 2. Download Audio
             var audio = YoutubeHelper.DownloadAudio(request.Vid);
@@ -230,5 +232,12 @@ namespace SpleeterAPI.Youtube
                 throw new Exception(shellResult.Output);
             }
         }
+
+        private void LogStart(YoutubeProcessRequest request, YoutubeVideoInfo info)
+        {
+            Startup.EphemeralLog($"=== YouTube Process ===", true);
+            Startup.EphemeralLog($"Request: {JsonConvert.SerializeObject(request)} - Title: {info.Filename} - Duration: {info.Duration}", true);
+        }
+
     }
 }
