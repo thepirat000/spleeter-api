@@ -11,15 +11,16 @@
     <meta name="googlebot" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<meta property="og:image" content="https://i.imgur.com/xrF9QUG.png" />
-	
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/jquery-ui.css">
+    <meta property="og:image" content="https://i.imgur.com/xrF9QUG.png" />
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="splitter.css">
 
     <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
     <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
 
-    <script type="text/javascript" src="https://code.jquery.com/jquery-compat-git.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
@@ -130,7 +131,10 @@
                             <div>
                                 <input type="text" id="url" class="search" value="" placeholder="YouTube URL or Video ID" style="min-width: 240px; text-align: center; width:100%;" />
                             </div>
-                            <div id="duration"></div>
+                            <div id="video-info">
+                                <span id="video-title"></span>
+                                <div id="duration"></div>
+                            </div>
                         </div>
                     </div>
 

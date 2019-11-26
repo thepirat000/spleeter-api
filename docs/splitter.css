@@ -226,3 +226,35 @@ select {
     padding: 0em;
     background-color: #08E;
 }
+
+#search-results {
+    max-height: 340px;
+    overflow: auto;
+    margin: 10px 0px 0px 0px;
+    border: solid 1px #08E;
+}
+
+#search-results img {
+    float: left;
+    vertical-align: middle;
+}
+
+#search-results div {
+    margin: 1px 1px 1px 1px;
+}
+
+#search-results span {
+    display: table-cell;
+    vertical-align: middle;
+    height: 90px;
+    padding-left: 10px;
+}
+
+.clickable {
+    display: block;
+    height: 90px;
+}
+
+#video-info {
+    padding-top: 10px;
+}

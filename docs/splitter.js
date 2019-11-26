@@ -81,9 +81,10 @@ $(document).ready(function () {
         if (vid) {
             $("#url").val(vid);
             $("#btn-split").focus();
-            getYoutubeVideoDuration(vid, function (dur) {
-                $("#duration").text("Duration: " + dur);
-                $("#duration").show();
+            getYoutubeVideoDuration(vid, function (dur, title) {
+                $("#duration").text(dur);
+                $("#video-title").text(title);
+                $("#video-info").show();
                 let durationInMinutes = parseInt(dur.split(':')[0]) * 60 + parseInt(dur.split(':')[1]);
                 if (durationInMinutes > max_duration_mins) {
                     $("#duration").css("color", "red");
@@ -219,7 +220,6 @@ async function onYoutubeSearch() {
                     title: resp.items[i].id.videoId
                 }).appendTo('#search-results');
                 $('<img/>', {
-                    style: 'vertical-align:middle',
                     src: resp.items[i].snippet.thumbnails.default.url
                 }).appendTo('#result' + i);
                 $('<span/>', {
@@ -282,12 +282,12 @@ async function getYoutubeVideoDuration(vid, callback) {
         'path': 'youtube/v3/videos',
         'params': {
             'id': vid,
-            'part': 'contentDetails'
+            'part': 'contentDetails,snippet'
         }
     });
     let resp = request.result;
     if (resp && resp.items && resp.items.length > 0 && resp.items[0].contentDetails) {
-        callback(YTDuration(resp.items[0].contentDetails.duration));
+        callback(YTDuration(resp.items[0].contentDetails.duration), resp.items[0].snippet.title);
     } else {
         stopWait();
         alert("Video ID not found. Reponse: " + JSON.stringify(resp));
@@ -333,6 +333,7 @@ function stopWait() {
     $("#btn-split").removeAttr('disabled');
     $("#div-main").find("*").removeClass('wait');
     $("#duration").hide();
+    $("#video-info").hide();
     $.modal.close();
     $("#wait-dialog").hide();
 }
