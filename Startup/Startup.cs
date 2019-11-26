@@ -105,8 +105,8 @@ namespace SpleeterAPI
             EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}", true);
         }
 
-        //[download] 100.0% of 2.79MiB at 22.33MiB/s ETA 00:00        
         private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s");
+
         public static void EphemeralLog(string text, bool important)
         {
             if (string.IsNullOrWhiteSpace(text))

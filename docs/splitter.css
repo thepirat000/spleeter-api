@@ -191,7 +191,7 @@ select {
     height: 34px;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background: url(down-arrow.svg) right/35px 15px no-repeat,url(down-arrow.svg) left/35px 15px no-repeat;
+    background: url(down-arrow.svg) right/35px 15px no-repeat;
 }
 
 #uploader, #options, #div-stems {
