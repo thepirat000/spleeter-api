@@ -9,16 +9,12 @@ namespace SpleeterAPI.Youtube
     public class SplitterCmdAdapter : ISplitterAdapter
     {
         private static Regex FileWrittenRegex = new Regex(@"INFO:spleeter:File\s.*\swritten");
-        private static Regex ErrorRegex = new Regex(@"ERROR:spleeter:.*|tensorflow/.*failed to initialize");
+        private static Regex ErrorRegex = new Regex(@"ERROR:spleeter:.*|tensorflow/.*failed to initialize|FileExistsError:\s");
         private static string Max_Duration = Startup.Configuration["Spleeter:MaxDuration"];
         private static string Anaconda_Activate_Script = Startup.Configuration["Spleeter:AnacondaScript"];
 
         public SplitProcessResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
-            if (format == "karaoke" || format == "vocals")
-            {
-                format = "2stems";
-            }
             var output = new StringBuilder();
             var status = new SplitProcessResult();
             var process = new Process
@@ -87,7 +83,7 @@ namespace SpleeterAPI.Youtube
 
         private static void ProcessOutputLine(string type, string line, SplitProcessResult status)
         {
-            Startup.EphemeralLog($"{type}: {line}", false);
+            Startup.EphemeralLog($"[spleeter] {type}: {line}", false);
             if (type == "stderr" && ErrorRegex.IsMatch(line))
             {
                 status.ErrorCount++;
@@ -99,10 +95,7 @@ namespace SpleeterAPI.Youtube
             }
         }
 
-
         // V2
-
-
         public SplitProcessResult Split(string inputFile, YoutubeProcessRequest request, string outputFolder, bool isBatch = false)
         {
             var output = new StringBuilder();

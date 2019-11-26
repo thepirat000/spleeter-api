@@ -197,7 +197,11 @@ namespace SpleeterAPI.Youtube
                 var stemFile = stemFiles.FirstOrDefault(sf => sf.FileNameWithoutExtension == request.SubFormats[0]);
                 if (stemFile != null)
                 {
-                    File.Copy(stemFile.FilePath, outputFilePath);
+                    File.Copy(stemFile.FilePath, outputFilePath, true);
+                }
+                else
+                {
+                    _logger.LogError($"Stem file {request.SubFormats[0]} not found for {request.Vid}");
                 }
             }
             else
