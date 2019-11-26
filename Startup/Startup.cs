@@ -105,8 +105,8 @@ namespace SpleeterAPI
             EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}", true);
         }
 
-        private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s");
-
+        private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s|\s\=\snp\.dtype\(\[\(");
+        // = np.dtype([("
         public static void EphemeralLog(string text, bool important)
         {
             if (string.IsNullOrWhiteSpace(text))

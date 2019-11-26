@@ -95,6 +95,7 @@ $(document).ready(function () {
                 } else {
                     $("#duration").css("color", "black");
                 }
+                $("#duration").show();
             });
         }
     });

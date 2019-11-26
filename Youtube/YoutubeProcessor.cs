@@ -44,6 +44,8 @@ namespace SpleeterAPI.Youtube
                 return new ProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
             }
 
+            _logger.LogInformation($"=== YouTube Process ===\nVid: {info.Filename}\nTitle: {info.Filename}\nDuration: {info.Duration}\n");
+
             // 2. Download Audio
             var audio = YoutubeHelper.DownloadAudio(request.Vid);
 
