@@ -87,7 +87,7 @@ namespace SpleeterAPI.Youtube
 
         private static void ProcessOutputLine(string type, string line, SplitProcessResult status)
         {
-            Startup.EphemeralLog($"{type}: {line}");
+            Startup.EphemeralLog($"{type}: {line}", false);
             if (type == "stderr" && ErrorRegex.IsMatch(line))
             {
                 status.ErrorCount++;

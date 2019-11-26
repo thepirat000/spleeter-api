@@ -27,7 +27,7 @@ namespace SpleeterAPI
                 details = msg,
                 exception = exception
             });
-            Startup.EphemeralLog(json);
+            Startup.EphemeralLog(json, true);
         }
     }
 }

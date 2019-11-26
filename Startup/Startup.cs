@@ -17,6 +17,7 @@ using Audit.Udp.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SpleeterAPI
 {
@@ -101,16 +102,31 @@ namespace SpleeterAPI
                         }
                     }));
             
-            EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}");
+            EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}", true);
         }
 
-        public static void EphemeralLog(string text)
+        //[download] 100.0% of 2.79MiB at 22.33MiB/s ETA 00:00        
+        private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s");
+        public static void EphemeralLog(string text, bool important)
         {
-            if (!string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(text))
             {
-                Console.WriteLine(text);
-                Audit.Core.AuditScope.CreateAndSave("Ephemeral", new { Status = text });
+                return;
             }
+            if (!important)
+            {
+                if (text.Contains(" FutureWarning: "))
+                {
+                    return;
+                }
+                if (_logFilterRegex.IsMatch(text))
+                {
+                    return;
+                }
+            }
+
+            Console.WriteLine(text);
+            Audit.Core.AuditScope.CreateAndSave("Ephemeral", new { Status = text });
         }
 
     }

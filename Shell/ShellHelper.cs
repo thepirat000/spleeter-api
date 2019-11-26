@@ -9,7 +9,7 @@ namespace SpleeterAPI
         public static ShellExecutionResult Execute(string cmd)
         {
             bool isWindows = Startup.IsWindows;
-            Startup.EphemeralLog($"Will execute: {cmd}");
+            Startup.EphemeralLog($"Will execute: {cmd}", true);
             var escapedArgs = isWindows ? cmd : cmd.Replace("\"", "\\\"");
             var outputBuilder = new StringBuilder();
             var process = new Process()
@@ -29,7 +29,7 @@ namespace SpleeterAPI
             (
                 delegate (object sender, DataReceivedEventArgs e)
                 {
-                    Startup.EphemeralLog(e.Data);
+                    Startup.EphemeralLog(e.Data, false);
                     outputBuilder.AppendLine(e.Data);
                 }
             );
@@ -37,7 +37,7 @@ namespace SpleeterAPI
             (
                 delegate (object sender, DataReceivedEventArgs e)
                 {
-                    Startup.EphemeralLog(e.Data);
+                    Startup.EphemeralLog(e.Data, false);
                     outputBuilder.AppendLine(e.Data);
                 }
             );
