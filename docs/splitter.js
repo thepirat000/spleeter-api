@@ -504,5 +504,18 @@ function presetClick(preset) {
         $("#div-stems input#toggle-accompaniment").prop('checked', true);
         $("input#rad-mp4").prop('checked', true);
     }
+	else if (preset === "audio-vocals") {
+        $("#type").val("2stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', false);
+        $("#div-stems input#toggle-vocals").prop('checked', true);
+        $("input#rad-mp3").prop('checked', true);
+	}
+	else if (preset === "default") {
+        $("#type").val("4stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', true);
+        $("input#rad-zip").prop('checked', true);
+	}
     return false;
 }
