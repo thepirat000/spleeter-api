@@ -1,21 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Audit.Core;
-using Audit.Udp;
-using Audit.Udp.Configuration;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -38,7 +28,7 @@ namespace SpleeterAPI
         public void ConfigureServices(IServiceCollection services)
         {
             // Do not use CORS for linux, should be added by nginx 
-            if (Environment.IsDevelopment() || IsWindows)
+            if (IsWindows && Configuration["cors_enabled"].ToLower() == "true")
             { 
                 services.AddCors();
             }
@@ -63,15 +53,15 @@ namespace SpleeterAPI
             }
 
             // Do not use HTTPS redirection in linux, since it will be done via nginx 
-            if (Environment.IsDevelopment() || IsWindows)
-            { 
+            if (IsWindows && Configuration["https_enabled"].ToLower() == "true")
+            {
                 app.UseHttpsRedirection();
             }
 
             app.UseRouting();
 
             // Do not use CORS for linux, should be added by nginx 
-            if (Environment.IsDevelopment() || IsWindows)
+            if (IsWindows && Configuration["cors_enabled"].ToLower() == "true")
             {
                 app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             }

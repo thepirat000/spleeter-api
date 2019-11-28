@@ -1,0 +1,120 @@
+# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force;
+Set-ExecutionPolicy Bypass -Scope Process -Force; 
+$down = New-Object System.Net.WebClient
+
+# Create restore point
+Checkpoint-Computer -Description 'Before spleeter-gpu'
+
+# Install chocolatey
+iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'));
+
+# Download dotnet core runtime & hosting bundle
+Write-Host "Download dotnet core runtime & hosting bundle", $PSScriptRoot -foregroundcolor "green";
+$url  = 'https://download.visualstudio.microsoft.com/download/pr/bf608208-38aa-4a40-9b71-ae3b251e110a/bc1cecb14f75cc83dcd4bbc3309f7086/dotnet-hosting-3.0.0-win.exe';
+$file = $PSScriptRoot + '\dotnet-hosting-3.0.0-win.exe';
+$down.DownloadFile($url,$file);
+# Install dotnet core runtime & hosting bundle
+Write-Host "Install dotnet core runtime & hosting bundle", $file -foregroundcolor "green";
+& $file /install /passive 
+
+#Enable IIS
+Write-Host "Installing IIS" -foregroundcolor "green";
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpErrors
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpRedirect
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationDevelopment
+Enable-WindowsOptionalFeature -online -norestart -FeatureName NetFx4Extended-ASPNET45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-NetFxExtensibility45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HealthAndDiagnostics
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpLogging
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-LoggingLibraries
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestMonitor
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpTracing
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Security
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestFiltering
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Performance
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerManagementTools
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-IIS6ManagementCompatibility
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Metabase
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementConsole
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-BasicAuthentication
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WindowsAuthentication
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-StaticContent
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-DefaultDocument
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebSockets
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationInit
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIFilter
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressionStatic
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
+choco install webdeploy -y
+choco install urlrewrite -y
+
+# Install dotnet core SDK
+Write-Host "Install dotnet core SDK", $PSScriptRoot -foregroundcolor "green";
+$url  = 'https://download.visualstudio.microsoft.com/download/pr/66adfd75-9c1d-4e44-8d9c-cdc0cbc41104/5288b628601e30b0fa10d64fdaf64287/dotnet-sdk-3.0.101-win-x64.exe';
+$file = $PSScriptRoot + '\dotnet-sdk-3.0.101-win-x64.exe';
+$down.DownloadFile($url,$file);
+& $file /install /passive
+
+#GIT
+Write-Host "Installing GIT" -foregroundcolor "green";
+choco install git -y
+
+#ffmpeg
+choco install ffmpeg -y
+
+#CUDA drivers
+Write-Host "Installing CUDA drivers" -foregroundcolor "green";
+choco install cuda --ignore-checksums -y 
+
+#Conda
+Write-Host "Installing miniconda3 (this can take some time)" -foregroundcolor "green";
+choco install miniconda3 -y
+
+& 'C:\tools\miniconda3\shell\condabin\conda-hook.ps1'; 
+conda activate 'C:\tools\miniconda3';
+
+Write-Host "Installing tensorflow spleeter-gpu (this can take some time)" -foregroundcolor "green";
+conda install -c conda-forge spleeter-gpu -y
+
+conda deactivate 
+
+#youtube-dl
+choco install youtube-dl -y
+
+#create eventsource name
+eventcreate /ID 1 /L APPLICATION /T INFORMATION  /SO Spleeter /D "Creating event source"
+
+#environment variables and dirs
+[Environment]::SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production", "Machine")
+[Environment]::SetEnvironmentVariable("MODEL_PATH", "c:\spleeter\model", "Machine")
+mkdir "c:\spleeter\input"
+mkdir "c:\spleeter\output"
+mkdir "c:\spleeter\model"
+mkdir "c:\spleeter\cache"
+
+#Refresh PATH environment variable
+refreshenv
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+
+#git clone
+mkdir "c:\git"
+cd "c:\git"
+
+git clone -q https://github.com/deezer/spleeter
+git clone -q https://github.com/thepirat000/spleeter-api
+
+
+#build and publish spleeter-api
+cd spleeter-api
+dotnet build SpleeterAPI.sln -c Release
+dotnet publish SpleeterAPI.csproj -c Release
+cd bin\Release\netcoreapp3.0\publish
+
+
+Write-Host "You can run the server in Kestrel with command: " -foregroundcolor "green";
+Write-Host "> dotnet C:\git\spleeter-api\bin\Release\netcoreapp3.0\publish\SpleeterAPI.dll"
+Write-Host "Installation complete... It's recommended that you restart the machine" -foregroundcolor "green";
