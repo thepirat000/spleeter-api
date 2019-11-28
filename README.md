@@ -1,6 +1,6 @@
 # spleeter-api
 
-Audio separation API using Spleeter from Deezer Research.
+Audio separation API using Spleeter (GPU) from Deezer Research.
 
 - Live demo: https://thepirat000.github.io/spleeter-api/
 
@@ -18,7 +18,7 @@ This tool allows to split the audio of a youtube video or any .mp3:
 
 Install the dependencies and pre-requisites with PowerShell setup script: [Setup.ps1](https://github.com/thepirat000/spleeter-api/blob/master/Setup.ps1)
 
-
+Tested on Azure VM of size "Standard D2 (2 vcpus, 7 GiB memory)" 
 
 
 
