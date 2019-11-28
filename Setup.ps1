@@ -107,7 +107,7 @@ cd "c:\git"
 git clone -q https://github.com/deezer/spleeter
 git clone -q https://github.com/thepirat000/spleeter-api
 
-xcopy "C:\git\spleeter-api\lib\nvcuda.dll" "c:\windows\system32\nvcuda.dll"
+copy "C:\git\spleeter-api\lib\nvcuda.dll" "c:\windows\system32\nvcuda.dll"
 
 #build and publish spleeter-api
 cd spleeter-api
@@ -119,4 +119,4 @@ cd bin\Release\netcoreapp3.0\publish
 Write-Host "You can run the server in Kestrel with command: " -foregroundcolor "green";
 Write-Host "> dotnet C:\git\spleeter-api\bin\Release\netcoreapp3.0\publish\SpleeterAPI.dll"
 Write-Host "Installation complete..."
-Weite-Host "It's recommended that you restart the machine" -foregroundcolor "green";
+Write-Host "It's recommended that you restart the machine" -foregroundcolor "green";

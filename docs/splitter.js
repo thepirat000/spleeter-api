@@ -5,8 +5,8 @@ var max_duration_mins = 30;
 //var split_yt_api = 'https://localhost:5001/yt';
 //var split_mp3_api = 'https://localhost:5001/mp3'; 
 
-var split_yt_api = 'https://spleeter-gpu.eastus.cloudapp.azure.com:8443/yt';
-var split_mp3_api = 'https://spleeter-gpu.eastus.cloudapp.azure.com:8443/mp3';
+var split_yt_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/yt';
+var split_mp3_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/mp3';
 
 
 var selectedFiles = [];
