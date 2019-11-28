@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.IO;
+using System;
 
 namespace SpleeterAPI
 {
     public static class ShellHelper
     {
-        public static ShellExecutionResult Execute(string cmd)
+        public static ShellExecutionResult Execute(string cmd, Action<string> stdErrDataReceivedCallback = null, Action<string> stdOutDataReceivedCallback = null)
         {
             bool isWindows = Startup.IsWindows;
             Startup.EphemeralLog($"Will execute: {cmd}", true);
@@ -29,7 +30,14 @@ namespace SpleeterAPI
             (
                 delegate (object sender, DataReceivedEventArgs e)
                 {
-                    Startup.EphemeralLog(e.Data, false);
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        stdErrDataReceivedCallback?.Invoke(e.Data);
+                    }
+                    if (stdErrDataReceivedCallback == null)
+                    {
+                        Startup.EphemeralLog(e.Data, false);
+                    }
                     outputBuilder.AppendLine(e.Data);
                 }
             );
@@ -37,7 +45,14 @@ namespace SpleeterAPI
             (
                 delegate (object sender, DataReceivedEventArgs e)
                 {
-                    Startup.EphemeralLog(e.Data, false);
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        stdOutDataReceivedCallback?.Invoke(e.Data);
+                    }
+                    if (stdOutDataReceivedCallback == null)
+                    {
+                        Startup.EphemeralLog(e.Data, false);
+                    }
                     outputBuilder.AppendLine(e.Data);
                 }
             );

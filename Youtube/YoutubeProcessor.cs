@@ -66,6 +66,9 @@ namespace SpleeterAPI.Youtube
                     _logger.LogInformation($"Deleting folder {splitOutputFolder}");
                     Directory.Delete(splitOutputFolder, true);
                 }
+                // Create the directory to avoid File exists error on spleeter separate process (probably because of missing exist_ok=True parameter in https://github.com/deezer/spleeter/blob/42d476f6fa8d06f498389d1e620d2f1f59565f51/spleeter/audio/ffmpeg.py#L108)
+                Directory.CreateDirectory(Path.Combine(splitOutputFolder, request.Vid));
+                // Execute the split
                 var splitResult = SpliterHelper.Split(audio.AudioFileFullPath, splitOutputFolder, request, isBatch: false);
                 _logger.LogInformation($"Separation for {request.Vid}: {(splitResult.ExitCode == 0 ? "Successful" : "Failed")}\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
                 if (splitResult.ExitCode != 0)

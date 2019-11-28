@@ -67,7 +67,7 @@ choco install git -y
 choco install ffmpeg -y
 
 #CUDA drivers
-Write-Host "Installing CUDA drivers" -foregroundcolor "green";
+Write-Host "Installing CUDA drivers (this can take some time)" -foregroundcolor "green";
 choco install cuda --ignore-checksums -y 
 
 #Conda
@@ -107,6 +107,7 @@ cd "c:\git"
 git clone -q https://github.com/deezer/spleeter
 git clone -q https://github.com/thepirat000/spleeter-api
 
+xcopy "C:\git\spleeter-api\lib\nvcuda.dll" "c:\windows\system32\nvcuda.dll"
 
 #build and publish spleeter-api
 cd spleeter-api
@@ -117,4 +118,5 @@ cd bin\Release\netcoreapp3.0\publish
 
 Write-Host "You can run the server in Kestrel with command: " -foregroundcolor "green";
 Write-Host "> dotnet C:\git\spleeter-api\bin\Release\netcoreapp3.0\publish\SpleeterAPI.dll"
-Write-Host "Installation complete... It's recommended that you restart the machine" -foregroundcolor "green";
+Write-Host "Installation complete..."
+Weite-Host "It's recommended that you restart the machine" -foregroundcolor "green";

@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 
 namespace SpleeterAPI.Youtube
 {
-    // Executes spleeter via conda
     public class SplitterCmdAdapter : ISplitterAdapter
     {
         private static Regex FileWrittenRegex = new Regex(@"INFO:spleeter:File\s.*\swritten");
@@ -65,10 +64,8 @@ namespace SpleeterAPI.Youtube
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine(Anaconda_Activate_Script);
-
+                    sw.WriteLine(@"""" + Anaconda_Activate_Script + @"""");
                     sw.WriteLine(@$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3");
-
                     sw.WriteLine("conda deactivate");
                 }
             }
