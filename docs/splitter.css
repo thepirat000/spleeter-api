@@ -281,3 +281,12 @@ select {
 #presets-section a {
     padding: 0px 4px 0px 4px;
 }
+
+#btn-split {
+	background-color: #0909; 
+	max-width: 200px;
+}
+
+.text-muted {
+	background-color: lightgray;
+}

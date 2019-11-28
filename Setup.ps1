@@ -49,6 +49,8 @@ Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIExtension
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIFilter
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressionStatic
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementService
+net start WMSvc
 choco install webdeploy -y
 choco install urlrewrite -y
 
@@ -116,7 +118,9 @@ dotnet publish SpleeterAPI.csproj -c Release
 cd bin\Release\netcoreapp3.0\publish
 
 
-Write-Host "You can run the server in Kestrel with command: " -foregroundcolor "green";
-Write-Host "> dotnet C:\git\spleeter-api\bin\Release\netcoreapp3.0\publish\SpleeterAPI.dll"
 Write-Host "Installation complete..."
+Write-Host ""
+Write-Host "You can run the server in Kestrel with command: " -foregroundcolor "green";
+Write-Host "dotnet C:\git\spleeter-api\bin\Release\netcoreapp3.0\publish\SpleeterAPI.dll --https_enabled false" -foregroundcolor "cyan";
+Write-Host ""
 Write-Host "It's recommended that you restart the machine" -foregroundcolor "green";
