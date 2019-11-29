@@ -22,7 +22,8 @@ namespace SpleeterAPI.Youtube
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private static string Cache_Root = Startup.Configuration["Spleeter:CacheFolder"];
         private readonly ILogger<YoutubeProcessor> _logger;
-        
+        private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
+
         public YoutubeProcessor(ILogger<YoutubeProcessor> logger)
         {
             _logger = logger;
@@ -38,6 +39,18 @@ namespace SpleeterAPI.Youtube
                 _logger.LogInformation($"Output cache hit: {outputFilePath}");
                 return new ProcessResponse() { FileId = outputFilename };
             }
+
+            // Check processing cache, avoid duplicate requests to run
+            var now = DateTime.UtcNow;
+            if (_processing.TryGetValue(outputFilename, out DateTime startDate))
+            {
+                var startedSecondsAgo = (now - startDate).TotalSeconds;
+                if (startedSecondsAgo < 1800)
+                {
+                    return new ProcessResponse() { Error = $"File {outputFilename} is being processed, started {startedSecondsAgo:N0} seconds ago. Try again later in few more minutes..." };
+                }
+            }
+            _processing[outputFilename] = now;
 
             // 1. Get video title and duration
             var info = YoutubeHelper.GetVideoInfo(request.Vid);
@@ -73,6 +86,7 @@ namespace SpleeterAPI.Youtube
                 _logger.LogInformation($"Separation for {request.Vid}: {(splitResult.ExitCode == 0 ? "Successful" : "Failed")}\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
                 if (splitResult.ExitCode != 0)
                 {
+                    _processing.TryRemove(outputFilename, out _);
                     return new ProcessResponse() { Error = $"spleeter separate command exited with code {splitResult.ExitCode}\nMessages: {splitResult.Output}." };
                 }
             }
@@ -80,6 +94,8 @@ namespace SpleeterAPI.Youtube
 
             // 4. Make output
             MakeOutput(audio.AudioFileFullPath, outputFilePath, splitOutputFolder, request);
+            
+            _processing.TryRemove(outputFilename, out _);
 
             return new ProcessResponse()              
             {

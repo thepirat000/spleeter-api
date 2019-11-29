@@ -22,7 +22,6 @@ namespace SpleeterAPI.Controllers
     public class YoutubeController : ControllerBase
     {
         private readonly ILogger<YoutubeController> _logger;
-        private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
         private static int Max_Duration_Seconds = int.Parse(Startup.Configuration["Youtube:MaxDuration"]);
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private readonly YoutubeProcessor _processor;
