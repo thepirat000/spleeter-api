@@ -14,7 +14,6 @@ using SpleeterAPI.Youtube;
 
 namespace SpleeterAPI.Controllers
 {
-
     [Route("yt")]
     [ApiController]
     [EnableCors]
@@ -37,7 +36,7 @@ namespace SpleeterAPI.Controllers
         /// </summary>
         [HttpPost("p")]
         [Produces("application/json")]
-        public ActionResult<ProcessResponse> Process_V2([FromBody]YoutubeProcessRequest request)
+        public ActionResult<ProcessResponse> Process([FromBody]YoutubeProcessRequest request)
         {
             if (request == null)
             {
@@ -99,10 +98,17 @@ namespace SpleeterAPI.Controllers
             return Problem($"File {outputFilename} not found");
         }
 
-        [HttpGet("dd/{vid}")]
+        /// <summary>
+        /// Direct Download video
+        /// </summary>
+        [HttpGet("ddv/{vid}")]
         [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = false)]
-        public ActionResult DirectDownload([FromRoute] string vid)
+        public ActionResult DirectDownloadVideo([FromRoute] string vid)
         {
+            if (!ValidateVid(vid))
+            {
+                return BadRequest($"'{vid}' is not a valid video ID");
+            }
             var info = YoutubeHelper.GetVideoInfo(vid);
             if (info.DurationSeconds > (Max_Duration_Seconds * 2))
             {
@@ -111,30 +117,41 @@ namespace SpleeterAPI.Controllers
             var video = YoutubeHelper.DownloadVideo(vid, true);
             if (System.IO.File.Exists(video.VideoFileFullPath))
             {
-                return PhysicalFile(video.VideoFileFullPath, "video/mp4", $"{System.IO.Path.GetFileName(video.VideoFileFullPath)}");
+                return PhysicalFile(video.VideoFileFullPath, "video/mp4", $"{info.Filename}-{vid}.mp3");
             }
             return BadRequest("Video requested was not found");
         }
 
-        private string GetArchiveName(string title, string format, bool includeHighFreq, bool isVideo)
+        /// <summary>
+        /// Direct Download audio
+        /// </summary>
+        [HttpGet("dda/{vid}")]
+        [AuditApi(IncludeResponseHeaders = true, IncludeHeaders = true, IncludeResponseBody = false)]
+        public ActionResult DirectDownloadAudio([FromRoute] string vid)
         {
-            var fileId = $"{title}.{format}";
-            if (includeHighFreq)
+            if (!ValidateVid(vid))
             {
-                fileId += ".h";
+                return BadRequest($"'{vid}' is not a valid video ID");
             }
-            return fileId;
-        }
 
-        private string FixFormat(string format, out string extension)
-        {
-            extension = format.EndsWith("_v") ? "mp4" : format.EndsWith("stems") ? "zip" : "mp3";
-            format = format.EndsWith("_v") ? format[0..^2] : format;
-            if (format != "2stems" && format != "4stems" && format != "5stems" && format != "karaoke" && format != "vocals")
+            var info = YoutubeHelper.GetVideoInfo(vid);
+            if (info.DurationSeconds > (Max_Duration_Seconds * 2))
             {
-                throw new ArgumentException("Format must be '2stems', '4stems' or '5stems'");
+                return BadRequest($"Cannot process videos longer than {Max_Duration_Seconds * 2} seconds");
             }
-            return format;
+
+            var outputFilePath = $"{Output_Root}/yt/{vid}.mp3";
+            if (System.IO.File.Exists(outputFilePath))
+            {
+                return PhysicalFile(outputFilePath, "audio/mpeg", $"{info.Filename}-{vid}.mp3");
+            }
+
+            var audio = YoutubeHelper.DownloadAudioMp3(vid);
+            if (System.IO.File.Exists(audio))
+            {
+                return PhysicalFile(audio, "audio/mpeg", $"{info.Filename}-{vid}.mp3");
+            }
+            return BadRequest("Video requested was not found");
         }
 
         private bool ValidateVid(string vid)

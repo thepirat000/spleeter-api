@@ -2,11 +2,11 @@ var buttonSplit = $("#btn-split");
 
 var max_duration_mins = 30;
 
-//var split_yt_api = 'https://localhost:5001/yt';
-//var split_mp3_api = 'https://localhost:5001/mp3'; 
+var split_yt_api = 'https://localhost:5001/yt';
+var split_mp3_api = 'https://localhost:5001/mp3'; 
 
-var split_yt_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/yt';
-var split_mp3_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/mp3';
+//var split_yt_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/yt';
+//var split_mp3_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/mp3';
 
 
 var selectedFiles = [];
@@ -16,7 +16,8 @@ var dzError = false;
 window.OnLoadCallback = () => {
     let k = getCookie("spleeter_gapikey");
 	if (k === "") {
-		$("#div-search").hide();
+        $("#div-search").hide();
+        $("#extra-buttons").hide();
 		return;
 	}
     if (k) {
@@ -28,6 +29,7 @@ window.OnLoadCallback = () => {
 		}
         if (!k) {
             $("#div-search").hide();
+            $("#extra-buttons").hide();
             return;
         }
         try {
@@ -41,15 +43,10 @@ window.OnLoadCallback = () => {
         }
     }
     $("#div-search").show();
+    $("#extra-buttons").show();
 };
 
 $(document).ready(function () {
-    let directDownloadVid = new URLSearchParams(window.location.search).get('d');
-    if (directDownloadVid) {
-        let downloadUrl = split_yt_api + "/dd/" + directDownloadVid;
-        window.open(downloadUrl);
-    }
-
     makeTabs();
     setupDropFilesBox();
 
@@ -518,5 +515,20 @@ function presetClick(preset) {
         $("#div-stems input").prop('checked', true);
         $("input#rad-zip").prop('checked', true);
 	}
+    return false;
+}
+
+function originalDownloadClick(type) {
+    let vid = validateUrl();
+    if (!vid) {
+        return false;
+    }
+    let downloadUrl;
+    if (type === "audio") {
+        downloadUrl = split_yt_api + "/dda/" + vid;
+    } else {
+        downloadUrl = split_yt_api + "/ddv/" + vid;
+    }
+    window.open(downloadUrl);
     return false;
 }

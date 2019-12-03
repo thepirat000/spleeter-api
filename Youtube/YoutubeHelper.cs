@@ -89,6 +89,24 @@ namespace SpleeterAPI.Youtube
             return result;
         }
 
+        public static string DownloadAudioMp3(string vid)
+        {
+            var filePathTemplate = $"{Output_Root}/yt/{vid}.%(ext)s";
+            
+            var cmd = $@"youtube-dl -f bestaudio --max-filesize 100M --extract-audio --audio-format mp3 --audio-quality 0 --no-check-certificate -o ""{filePathTemplate}"" ""https://youtu.be/{vid}""";
+            var shellResult = ShellHelper.Execute(cmd);
+            if (shellResult.ExitCode != 0)
+            {
+                throw new Exception($"youtube-dl audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
+            }
+            var outputFilePath = $"{Output_Root}/yt/{vid}.mp3";
+            if (!File.Exists(outputFilePath))
+            {
+                throw new Exception($"Audio filename {outputFilePath} not found after youtube-dl");
+            }
+            return outputFilePath;
+        }
+
         public static YoutubeVideoResponse DownloadVideo(string vid, bool includeSubtitles)
         {
             var result = new YoutubeVideoResponse();

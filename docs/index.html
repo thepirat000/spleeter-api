@@ -39,14 +39,14 @@
 
             <div id="div-config">
                 <div id="presets-section">
-                    <span style="font-weight: bold;" >Presets: </span>
+                    <span style="font-weight: bold;">Presets: </span>
                     <a href="audio/karaoke" onclick="return presetClick('audio-karaoke');">Karaoke</a>
                     |
                     <a href="video/karaoke" onclick="return presetClick('video-karaoke');">Video Karaoke</a>
-					|
-					<a href="audio/vocals" onclick="return presetClick('audio-vocals');">Only vocals</a>
-					|
-					<a href="default" onclick="return presetClick('default');">Default</a>
+                    |
+                    <a href="audio/vocals" onclick="return presetClick('audio-vocals');">Vocals</a>
+                    |
+                    <a href="default" onclick="return presetClick('default');">Default</a>
                 </div>
                 <div>
                     <span class="section-title">Mode</span>
@@ -170,6 +170,11 @@
 
             <div>
                 <div><button id="btn-split" class="split-button">Split</button></div>
+                <div id="extra-buttons" style="font-size: small;">
+                    <a href="audio/original" onclick="return originalDownloadClick('audio');">Original audio</a>
+                    |
+                    <a href="video/original" onclick="return originalDownloadClick('video');">Original video</a>
+                </div>
             </div>
 
             <footer class="border-top footer text-muted">
