@@ -117,7 +117,7 @@ namespace SpleeterAPI.Controllers
             var video = YoutubeHelper.DownloadVideo(vid, true);
             if (System.IO.File.Exists(video.VideoFileFullPath))
             {
-                return PhysicalFile(video.VideoFileFullPath, "video/mp4", $"{info.Filename}-{vid}.mp3");
+                return PhysicalFile(video.VideoFileFullPath, "video/mp4", $"{info.Filename}-{vid}.mp4");
             }
             return BadRequest("Video requested was not found");
         }
