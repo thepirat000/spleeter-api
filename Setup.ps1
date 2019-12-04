@@ -51,8 +51,8 @@ Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressio
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementService
 net start WMSvc
-choco install webdeploy -y
-choco install urlrewrite -y
+choco install webdeploy -y --no-progress
+choco install urlrewrite -y --no-progress
 
 # Install dotnet core SDK
 Write-Host "Install dotnet core SDK", $PSScriptRoot -foregroundcolor "green";
@@ -63,18 +63,18 @@ $down.DownloadFile($url,$file);
 
 #GIT
 Write-Host "Installing GIT" -foregroundcolor "green";
-choco install git -y
+choco install git -y --no-progress
 
 #ffmpeg
-choco install ffmpeg -y
+choco install ffmpeg -y --no-progress
 
 #CUDA drivers
 Write-Host "Installing CUDA drivers (this can take some time)" -foregroundcolor "green";
-choco install cuda --ignore-checksums -y 
+choco install cuda --ignore-checksums -y --no-progress
 
 #Conda
 Write-Host "Installing miniconda3 (this can take some time)" -foregroundcolor "green";
-choco install miniconda3 -y
+choco install miniconda3 -y --no-progress
 
 & 'C:\tools\miniconda3\shell\condabin\conda-hook.ps1'; 
 conda activate 'C:\tools\miniconda3';
@@ -85,7 +85,7 @@ conda install -c conda-forge spleeter-gpu -y
 conda deactivate 
 
 #youtube-dl
-choco install youtube-dl -y
+choco install youtube-dl -y --no-progress
 
 #create eventsource name
 eventcreate /ID 1 /L APPLICATION /T INFORMATION  /SO Spleeter /D "Creating event source"

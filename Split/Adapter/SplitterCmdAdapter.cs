@@ -70,10 +70,8 @@ namespace SpleeterAPI.Youtube
                 }
             }
 
-            process.WaitForExit(milliseconds: 900000);
-            try { process.CancelOutputRead(); } finally { }
-            try { process.CancelErrorRead(); } finally { }
-
+            WaitOrKill(process, 15);
+            
             status.ExitCode = process.ExitCode != 0 ? process.ExitCode : status.FileWrittenCount == 0 ? -1 : 0;
             return status;
         }
@@ -152,13 +150,31 @@ namespace SpleeterAPI.Youtube
                 }
             }
 
-            process.WaitForExit(milliseconds: 900000);
-            process.CancelOutputRead();
-            process.CancelErrorRead();
+            WaitOrKill(process, 15);
 
             status.ExitCode = process.ExitCode != 0 ? process.ExitCode : status.FileWrittenCount == 0 ? -1 : 0;
             return status;
         }
+
+
+        private void WaitOrKill(Process process, int minutes)
+        {
+            if (!process.WaitForExit(milliseconds: minutes * 60 * 1000))
+            {
+                Startup.EphemeralLog($"---------------> PROCESS SPLEETER EXITED AFTER TIMEOUT. Killing process.", true);
+                try
+                {
+                    process.Kill(true);
+                }
+                catch
+                {
+                    try { process.Kill(); } finally { }
+                }
+            }
+            process.CancelOutputRead();
+            process.CancelErrorRead();
+        }
+
     }
 
 

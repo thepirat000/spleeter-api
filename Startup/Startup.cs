@@ -88,7 +88,9 @@ namespace SpleeterAPI
                         }
                         else
                         {
-                            return Encoding.UTF8.GetBytes(ev.ToJson());
+                            var action = (ev as Audit.WebApi.AuditEventWebApi)?.Action;
+                            var msg = $"Response: {action.ResponseStatusCode} {action.ResponseStatus}: {action.ResponseBody?.Value}. Request: {action.RequestUrl}. Event: {action.ToJson()}";
+                            return Encoding.UTF8.GetBytes(msg);
                         }
                     }));
             
