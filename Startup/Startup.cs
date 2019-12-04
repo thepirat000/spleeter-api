@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Audit.Core;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace SpleeterAPI
 {
@@ -89,7 +90,7 @@ namespace SpleeterAPI
                         else
                         {
                             var action = (ev as Audit.WebApi.AuditEventWebApi)?.Action;
-                            var msg = $"Response: {action.ResponseStatusCode} {action.ResponseStatus}: {action.ResponseBody?.Value}. Request: {action.RequestUrl}. Event: {action.ToJson()}";
+                            var msg = $"Response: {action.ResponseStatusCode} {action.ResponseStatus}: {JsonConvert.SerializeObject(action.ResponseBody?.Value)}. Request: {action.RequestUrl}. Event: {action.ToJson()}";
                             return Encoding.UTF8.GetBytes(msg);
                         }
                     }));
