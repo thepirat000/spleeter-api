@@ -139,13 +139,14 @@ namespace SpleeterAPI.Controllers
             {
                 return BadRequest();
             }
-            var file = $"{Output_Root}/{fn}";
-            var cType = fn.ToLower().EndsWith("zip") ? "application/zip" : "application/mp3";
+            var fileName = Path.GetFileName(fn);
+            var file = $"{Output_Root}/{fileName}";
+            var cType = fileName.ToLower().EndsWith("zip") ? "application/zip" : "application/mp3";
             if (System.IO.File.Exists(file))
             {
-                return PhysicalFile(file, cType, fn);
+                return PhysicalFile(file, cType, fileName);
             }
-            return Problem($"File {fn} not found");
+            return Problem($"File {fileName} not found");
         }
 
         private string GetArchiveName(IFormFileCollection files, string format, bool includeHf)
