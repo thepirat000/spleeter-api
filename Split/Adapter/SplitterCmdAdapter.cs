@@ -64,7 +64,7 @@ namespace SpleeterAPI.Youtube
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine(@"""" + Anaconda_Activate_Script + @"""");
+                    sw.WriteLine(Anaconda_Activate_Script);
                     sw.WriteLine(@$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3");
                     sw.WriteLine("conda deactivate");
                 }
