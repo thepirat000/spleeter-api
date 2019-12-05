@@ -181,9 +181,13 @@ function makeTabs() {
         if (isYoutube) {
             $("#container-stems").show();
             $("#container-output").show();
+            if (getCookie("spleeter_gapikey")) {
+                $("#extra-buttons").show();
+            }
         } else {
             $("#container-stems").hide();
             $("#container-output").hide();
+            $("#extra-buttons").hide();
         }
 
         return false;
