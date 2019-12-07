@@ -91,7 +91,7 @@ namespace SpleeterAPI
                         else
                         {
                             var action = (ev as Audit.WebApi.AuditEventWebApi)?.Action;
-                            var msg = $"Action: {action.ControllerName}/{action.ActionName}?{new Uri(action.RequestUrl).Query} - Response: {action.ResponseStatusCode} {action.ResponseStatus}: {JsonConvert.SerializeObject(action.ResponseBody?.Value, JsonSettings)}. Event: {action.ToJson()}";
+                            var msg = $"Action: {action.ControllerName}/{action.ActionName}{new Uri(action.RequestUrl).Query} - Response: {action.ResponseStatusCode} {action.ResponseStatus}: {JsonConvert.SerializeObject(action.ResponseBody?.Value, JsonSettings)}. Event: {action.ToJson()}";
                             return Encoding.UTF8.GetBytes(msg);
                         }
                     }));
