@@ -59,18 +59,19 @@ namespace SpleeterAPI.Youtube
                 formatParam = $"-p spleeter:{format}";
             }
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
-            // Pass multiple commands to cmd.exe
+
+            var separateCommand = @$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3";
             using (var sw = process.StandardInput)
             {
                 if (sw.BaseStream.CanWrite)
                 {
                     sw.WriteLine(Anaconda_Activate_Script);
-                    sw.WriteLine(@$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3");
+                    sw.WriteLine(separateCommand);
                     sw.WriteLine("conda deactivate");
                 }
             }
 
-            WaitOrKill(process, 15);
+            WaitOrKill(process, 15, separateCommand);
             
             status.ExitCode = process.ExitCode != 0 ? process.ExitCode : status.FileWrittenCount == 0 ? -1 : 0;
             return status;
@@ -137,31 +138,29 @@ namespace SpleeterAPI.Youtube
                 formatParam = $"-p spleeter:{request.BaseFormat}";
             }
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
-            // Pass multiple commands to cmd.exe
+            var separateCommand = @$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3";
             using (var sw = process.StandardInput)
             {
                 if (sw.BaseStream.CanWrite)
                 {
                     sw.WriteLine(Anaconda_Activate_Script);
-
-                    sw.WriteLine(@$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3");
-
+                    sw.WriteLine(separateCommand);
                     sw.WriteLine("conda deactivate");
                 }
             }
 
-            WaitOrKill(process, 15);
+            WaitOrKill(process, 15, separateCommand);
 
             status.ExitCode = process.ExitCode != 0 ? process.ExitCode : status.FileWrittenCount == 0 ? -1 : 0;
             return status;
         }
 
 
-        private void WaitOrKill(Process process, int minutes)
+        private void WaitOrKill(Process process, int minutes, string command)
         {
             if (!process.WaitForExit(milliseconds: minutes * 60 * 1000))
             {
-                Startup.EphemeralLog($"---------------> PROCESS SPLEETER EXITED AFTER TIMEOUT. Killing process.", true);
+                Startup.EphemeralLog($"---------------> PROCESS SPLEETER EXITED AFTER TIMEOUT. Killing process. Command: {command}", true);
                 try
                 {
                     process.Kill(true);

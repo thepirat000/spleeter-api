@@ -14,6 +14,7 @@ namespace SpleeterAPI
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Environment = env;
@@ -21,7 +22,7 @@ namespace SpleeterAPI
         }
 
         public static bool IsWindows { get; private set; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
+        private static JsonSerializerSettings JsonSettings = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore, ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
         public static IConfiguration Configuration { get; private set; }
         public static IWebHostEnvironment Environment { get; private set; }
 
@@ -74,7 +75,7 @@ namespace SpleeterAPI
                 endpoints.MapControllers();
             });
         }
-
+        
         private void ConfigureAuditNet()
         {
             Audit.Core.Configuration.Setup()
@@ -90,7 +91,7 @@ namespace SpleeterAPI
                         else
                         {
                             var action = (ev as Audit.WebApi.AuditEventWebApi)?.Action;
-                            var msg = $"Response: {action.ResponseStatusCode} {action.ResponseStatus}: {JsonConvert.SerializeObject(action.ResponseBody?.Value)}. Request: {action.RequestUrl}. Event: {action.ToJson()}";
+                            var msg = $"Action: {action.ControllerName}/{action.ActionName}?{new Uri(action.RequestUrl).Query} - Response: {action.ResponseStatusCode} {action.ResponseStatus}: {JsonConvert.SerializeObject(action.ResponseBody?.Value, JsonSettings)}. Event: {action.ToJson()}";
                             return Encoding.UTF8.GetBytes(msg);
                         }
                     }));
