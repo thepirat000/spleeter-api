@@ -9,6 +9,7 @@ using Audit.Core;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace SpleeterAPI
 {
@@ -21,6 +22,7 @@ namespace SpleeterAPI
             Configuration = configuration;
         }
 
+        private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s|\s\=\snp\.dtype\(\[\(");
         public static bool IsWindows { get; private set; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         private static JsonSerializerSettings JsonSettings = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore, ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
         public static IConfiguration Configuration { get; private set; }
@@ -42,6 +44,7 @@ namespace SpleeterAPI
                 });
 
             services.AddSingleton<Youtube.YoutubeProcessor>();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,7 +78,7 @@ namespace SpleeterAPI
                 endpoints.MapControllers();
             });
         }
-        
+
         private void ConfigureAuditNet()
         {
             Audit.Core.Configuration.Setup()
@@ -99,8 +102,6 @@ namespace SpleeterAPI
             EphemeralLog($"Spleeter started at {DateTime.Now}. ENV: {Environment.EnvironmentName}", true);
         }
 
-        private static Regex _logFilterRegex = new Regex(@"\[download\]\s.*\sETA\s|\s\=\snp\.dtype\(\[\(");
-        // = np.dtype([("
         public static void EphemeralLog(string text, bool important)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -121,6 +122,39 @@ namespace SpleeterAPI
 
             Console.WriteLine(text);
             Audit.Core.AuditScope.CreateAndSave("Ephemeral", new { Status = text });
+        }
+
+        private static object _fleLogLocker = new object();
+        public static void FileLog(string text, bool noAppend = false)
+        {
+            var logFile = GetFileLogPath();
+            if (logFile == null)
+            {
+                return;
+            }
+            lock (_fleLogLocker)
+            {
+                if (noAppend)
+                {
+                    if (!File.Exists(logFile))
+                    {
+                        File.WriteAllText(logFile, text + System.Environment.NewLine);
+                    }
+                }
+                else
+                {
+                    File.AppendAllText(logFile, text + System.Environment.NewLine);
+                }
+            }
+        }
+        public static string GetFileLogPath()
+        {
+            var logPath = Configuration["FileLogPath"];
+            if (string.IsNullOrEmpty(logPath))
+            {
+                return null;
+            }
+            return Path.Combine(logPath, $"{DateTime.Now:yyyyMMdd}.log");
         }
 
     }

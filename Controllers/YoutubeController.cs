@@ -58,9 +58,12 @@ namespace SpleeterAPI.Controllers
             {
                 request.Options = new YoutubeProcessOptions();
             }
-
+            Startup.FileLog(YoutubeOutputLogEntry.GetHeader(), true);
             var result = _processor.Process(request);
-
+            if (result.LogEntry != null)
+            {
+                Startup.FileLog(result.LogEntry.ToString());
+            }
             return result;
         }
 

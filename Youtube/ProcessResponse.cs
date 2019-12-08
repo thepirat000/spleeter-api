@@ -6,5 +6,6 @@
         public string Error { get; set; }
         public string TotalTime { get; set; }
         public string Speed { get; set; }
+        public YoutubeOutputLogEntry LogEntry { get; set; }
     }
 }

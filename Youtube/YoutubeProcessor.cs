@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -24,21 +25,33 @@ namespace SpleeterAPI.Youtube
         private static string Cache_Root = Startup.Configuration["Spleeter:CacheFolder"];
         private readonly ILogger<YoutubeProcessor> _logger;
         private readonly static ConcurrentDictionary<string, DateTime> _processing = new ConcurrentDictionary<string, DateTime>();
-
-        public YoutubeProcessor(ILogger<YoutubeProcessor> logger)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public YoutubeProcessor(ILogger<YoutubeProcessor> logger, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public ProcessResponse Process(YoutubeProcessRequest request)
         {
+            var mainSw = Stopwatch.StartNew();
+            var logEntry = new YoutubeOutputLogEntry()
+            {
+                StartTime = DateTime.Now,
+                Vid = request.Vid,
+                Config = $"{request.BaseFormat}{(request.Options.IncludeHighFrequencies ? "-hf" : "")}{request.Extension}",
+                IpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(),
+                Cache = "Miss"
+            };
             // 0. Check output cache
             var outputFilename = GetOutputFileName(request.Vid, request.BaseFormat, request.SubFormats, request.Extension, request.Options.IncludeHighFrequencies);
             var outputFilePath = $"{Output_Root}/yt/{outputFilename}";
             if (File.Exists(outputFilePath))
             {
+                logEntry.Cache = "L1 HIT";
+                logEntry.TimeToProcess = (int)mainSw.Elapsed.TotalSeconds;
                 _logger.LogInformation($"Output cache hit: {outputFilePath}");
-                return new ProcessResponse() { FileId = outputFilename };
+                return new ProcessResponse() { FileId = outputFilename, LogEntry = logEntry };
             }
 
             // Check processing cache, avoid duplicate requests to run
@@ -59,7 +72,7 @@ namespace SpleeterAPI.Youtube
             {
                 return new ProcessResponse() { Error = $"Cannot process videos longer than {Max_Duration_Seconds} seconds" };
             }
-
+            logEntry.Title = info.Filename;
             LogStart(request, info);
 
             // 2. Download Audio
@@ -71,6 +84,7 @@ namespace SpleeterAPI.Youtube
             int fileCount = Directory.Exists(splitOutputFolder) ? Directory.GetFiles(splitOutputFolder, "*.mp3", SearchOption.AllDirectories).Length : 0;
             if (fileCount == int.Parse(request.BaseFormat.Substring(0, 1)))
             {
+                logEntry.Cache = "L2 HIT";
                 _logger.LogInformation("Split output cache hit");
             }
             else
@@ -85,10 +99,13 @@ namespace SpleeterAPI.Youtube
                 // Execute the split
                 var splitResult = SpliterHelper.Split(audio.AudioFileFullPath, splitOutputFolder, request, isBatch: false);
                 _logger.LogInformation($"Separation for {request.Vid}: {(splitResult.ExitCode == 0 ? "Successful" : "Failed")}\n\tDuration: {info.Duration}\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
+                logEntry.TimeToSeparate = (int)sw.Elapsed.TotalSeconds;
+                logEntry.Success = splitResult.ExitCode == 0;
+                logEntry.Errors = string.Join(", ", splitResult.Errors);
                 if (splitResult.ExitCode != 0)
                 {
                     _processing.TryRemove(outputFilename, out _);
-                    return new ProcessResponse() { Error = $"spleeter separate command exited with code {splitResult.ExitCode}\nMessages: {splitResult.Output}." };
+                    return new ProcessResponse() { Error = $"spleeter separate command exited with code {splitResult.ExitCode}\nMessages: {splitResult.Output}.", LogEntry = logEntry };
                 }
             }
             sw.Stop();
@@ -102,7 +119,8 @@ namespace SpleeterAPI.Youtube
             {
                 FileId = outputFilename,	
                 Speed = sw.Elapsed.TotalSeconds == 0 ? null : $"{info.DurationSeconds / sw.Elapsed.TotalSeconds:N1}x",	
-                TotalTime = sw.Elapsed.ToString("hh\\:mm\\:ss")
+                TotalTime = sw.Elapsed.ToString("hh\\:mm\\:ss"),
+                LogEntry = logEntry
             };
         }
 
