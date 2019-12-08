@@ -106,6 +106,7 @@ namespace SpleeterAPI.Youtube
                 if (splitResult.ExitCode != 0)
                 {
                     _processing.TryRemove(outputFilename, out _);
+                    logEntry.TimeToProcess = (int)mainSw.Elapsed.TotalSeconds;
                     return new ProcessResponse() { Error = $"spleeter separate command exited with code {splitResult.ExitCode}\nMessages: {splitResult.Output}.", LogEntry = logEntry };
                 }
             }
@@ -116,6 +117,7 @@ namespace SpleeterAPI.Youtube
             
             _processing.TryRemove(outputFilename, out _);
             logEntry.Success = true;
+            logEntry.TimeToProcess = (int)mainSw.Elapsed.TotalSeconds;
             return new ProcessResponse()              
             {
                 FileId = outputFilename,	

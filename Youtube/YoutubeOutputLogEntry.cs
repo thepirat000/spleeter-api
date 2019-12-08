@@ -18,6 +18,7 @@ namespace SpleeterAPI.Youtube
         public string Errors { get => errors; set => errors = value?.Replace(Separator, Replacement); }
         public int TimeToSeparate { get; set; }
         public int TimeToProcess { get; set; }
+        public int Duration { get; set; }
         public string Cache { get; set; }
         public string IpAddress { get; set; }
 
@@ -25,12 +26,13 @@ namespace SpleeterAPI.Youtube
         {
             return $"{StartTime:yyyy-MM-dd HH:mm:ss}{Separator}"
                 + $"{Vid}{Separator}"
-                + $"{Config}{Separator}"
                 + $"{Title}{Separator}"
+                + $"{Cache}{Separator}"
+                + $"{Config}{Separator}"
                 + $"{Success}{Separator}"
+                + $"{Duration}{Separator}"
                 + $"{TimeToProcess}{Separator}"
                 + $"{TimeToSeparate}{Separator}"
-                + $"{Cache}{Separator}"
                 + $"{IpAddress}{Separator}"
                 + $"{Errors}";
         }
@@ -39,12 +41,13 @@ namespace SpleeterAPI.Youtube
         {
             return $"StartTime{Separator}"
                 + $"Vid{Separator}"
-                + $"Config{Separator}"
                 + $"Title{Separator}"
+                + $"Cache{Separator}"
+                + $"Config{Separator}"
                 + $"Success{Separator}"
+                + $"Duration{Separator}"
                 + $"TimeToProcess{Separator}"
                 + $"TimeToSeparate{Separator}"
-                + $"Cache{Separator}"
                 + $"IpAddress{Separator}"
                 + $"Errors";
         }
