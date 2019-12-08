@@ -49,6 +49,7 @@ namespace SpleeterAPI.Youtube
             if (File.Exists(outputFilePath))
             {
                 logEntry.Cache = "L1 HIT";
+                logEntry.Success = true;
                 logEntry.TimeToProcess = (int)mainSw.Elapsed.TotalSeconds;
                 _logger.LogInformation($"Output cache hit: {outputFilePath}");
                 return new ProcessResponse() { FileId = outputFilename, LogEntry = logEntry };
@@ -114,7 +115,7 @@ namespace SpleeterAPI.Youtube
             MakeOutput(audio.AudioFileFullPath, outputFilePath, splitOutputFolder, request);
             
             _processing.TryRemove(outputFilename, out _);
-
+            logEntry.Success = true;
             return new ProcessResponse()              
             {
                 FileId = outputFilename,	
