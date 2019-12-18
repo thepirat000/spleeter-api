@@ -1,3 +1,21 @@
+param(
+[Parameter()][String]$type="",
+[Parameter()][String]$iis=""
+) 
+
+if (!$type) {
+    $type = Read-Host -Prompt 'Enter the installation type (cpu/gpu): ';
+}
+if ($type -ne "cpu" -and $type -ne "gpu") {
+    return;
+}
+if (!$iis) {
+    $iis = Read-Host -Prompt 'Install IIS components (y/n): '
+}
+if ($iis -ne "y" -and $iis -ne "n") {
+    return;
+}
+
 # Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force;
 Set-ExecutionPolicy Bypass -Scope Process -Force; 
 $down = New-Object System.Net.WebClient
@@ -18,41 +36,43 @@ Write-Host "Install dotnet core runtime & hosting bundle", $file -foregroundcolo
 & $file /install /passive 
 
 #Enable IIS
-Write-Host "Installing IIS" -foregroundcolor "green";
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpErrors
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpRedirect
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationDevelopment
-Enable-WindowsOptionalFeature -online -norestart -FeatureName NetFx4Extended-ASPNET45
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-NetFxExtensibility45
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HealthAndDiagnostics
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpLogging
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-LoggingLibraries
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestMonitor
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpTracing
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Security
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestFiltering
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Performance
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerManagementTools
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-IIS6ManagementCompatibility
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Metabase
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementConsole
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-BasicAuthentication
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WindowsAuthentication
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-StaticContent
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-DefaultDocument
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebSockets
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationInit
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIExtensions
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIFilter
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressionStatic
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
-Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementService
-net start WMSvc
-choco install webdeploy -y --no-progress
-choco install urlrewrite -y --no-progress
+if ($iis -eq "y") {
+    Write-Host "Installing IIS" -foregroundcolor "green";
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpErrors
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpRedirect
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationDevelopment
+    Enable-WindowsOptionalFeature -online -norestart -FeatureName NetFx4Extended-ASPNET45
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-NetFxExtensibility45
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HealthAndDiagnostics
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpLogging
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-LoggingLibraries
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestMonitor
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpTracing
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Security
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestFiltering
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Performance
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerManagementTools
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-IIS6ManagementCompatibility
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Metabase
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementConsole
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-BasicAuthentication
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WindowsAuthentication
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-StaticContent
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-DefaultDocument
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebSockets
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationInit
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIExtensions
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIFilter
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressionStatic
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
+    Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementService
+    net start WMSvc
+    choco install webdeploy -y --no-progress
+    choco install urlrewrite -y --no-progress
+}
 
 # Install dotnet core SDK
 Write-Host "Install dotnet core SDK", $PSScriptRoot -foregroundcolor "green";
@@ -68,9 +88,11 @@ choco install git -y --no-progress
 #ffmpeg
 choco install ffmpeg -y --no-progress
 
-#CUDA drivers
-Write-Host "Installing CUDA drivers (this can take some time)" -foregroundcolor "green";
-choco install cuda --ignore-checksums -y --no-progress
+if ($type -eq "gpu") {
+    #CUDA drivers
+    Write-Host "Installing CUDA drivers (this can take some time)" -foregroundcolor "green";
+    choco install cuda --ignore-checksums -y --no-progress
+}
 
 #Conda
 Write-Host "Installing miniconda3 (this can take some time)" -foregroundcolor "green";
@@ -79,8 +101,14 @@ choco install miniconda3 -y --no-progress
 & 'C:\tools\miniconda3\shell\condabin\conda-hook.ps1'; 
 conda activate 'C:\tools\miniconda3';
 
-Write-Host "Installing tensorflow spleeter-gpu (this can take some time)" -foregroundcolor "green";
-conda install -c conda-forge spleeter-gpu -y
+if ($type -eq "gpu") {
+    Write-Host "Installing tensorflow spleeter-gpu (this can take some time)" -foregroundcolor "green";
+    conda install -c conda-forge spleeter-gpu -y
+} 
+else {
+    Write-Host "Installing tensorflow spleeter-cpu (this can take some time)" -foregroundcolor "green";
+    conda install -c conda-forge spleeter-cpu -y
+}
 
 conda deactivate 
 
