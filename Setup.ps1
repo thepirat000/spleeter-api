@@ -1,23 +1,25 @@
+# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force;
+
 param(
 [Parameter()][String]$type="",
 [Parameter()][String]$iis=""
 ) 
 
+Set-ExecutionPolicy Bypass -Scope Process -Force; 
+
 if (!$type) {
-    $type = Read-Host -Prompt 'Enter the installation type (cpu/gpu): ';
+    $type = Read-Host -Prompt 'Enter the installation type (cpu/gpu)';
 }
 if ($type -ne "cpu" -and $type -ne "gpu") {
     return;
 }
 if (!$iis) {
-    $iis = Read-Host -Prompt 'Install IIS components (y/n): '
+    $iis = Read-Host -Prompt 'Install IIS components (y/n)'
 }
 if ($iis -ne "y" -and $iis -ne "n") {
     return;
 }
 
-# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force;
-Set-ExecutionPolicy Bypass -Scope Process -Force; 
 $down = New-Object System.Net.WebClient
 
 # Create restore point
@@ -37,7 +39,7 @@ Write-Host "Install dotnet core runtime & hosting bundle", $file -foregroundcolo
 
 #Enable IIS
 if ($iis -eq "y") {
-    Write-Host "Installing IIS" -foregroundcolor "green";
+    Write-Host "Installing IIS features" -foregroundcolor "green";
     Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
     Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
     Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
@@ -106,8 +108,8 @@ if ($type -eq "gpu") {
     conda install -c conda-forge spleeter-gpu -y
 } 
 else {
-    Write-Host "Installing tensorflow spleeter-cpu (this can take some time)" -foregroundcolor "green";
-    conda install -c conda-forge spleeter-cpu -y
+    Write-Host "Installing spleeter-cpu (this can take some time)" -foregroundcolor "green";
+    conda install -c conda-forge spleeter -y
 }
 
 conda deactivate 
@@ -137,7 +139,9 @@ cd "c:\git"
 git clone -q https://github.com/deezer/spleeter
 git clone -q https://github.com/thepirat000/spleeter-api
 
-copy "C:\git\spleeter-api\lib\nvcuda.dll" "c:\windows\system32\nvcuda.dll"
+if ($type -eq "gpu") {
+    copy "C:\git\spleeter-api\lib\nvcuda.dll" "c:\windows\system32\nvcuda.dll"
+}
 
 #build and publish spleeter-api
 cd spleeter-api
