@@ -1,6 +1,6 @@
 # spleeter-api
 
-Audio separation API using Spleeter (GPU) from Deezer Research.
+Audio separation API using Spleeter (CPU or GPU) from Deezer Research.
 
 - Live demo: https://thepirat000.github.io/spleeter-api/
 
@@ -22,7 +22,7 @@ Install the dependencies and pre-requisites with PowerShell setup script: [Setup
 
 Tested on Azure VM of size "Standard D2 (2 vcpus, 7 GiB memory)" 
 
-
+UDP Logging port: 2223
 
 
 
