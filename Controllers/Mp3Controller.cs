@@ -104,6 +104,11 @@ namespace SpleeterAPI.Controllers
             // 2. call spleeter with those multiple files
             var sw = Stopwatch.StartNew();
             var inputFileParam = string.Join(' ', inputFilenames.Select(fn => $"\"{inputFolder}/{fn}\""));
+            // Create the directories output to avoid File exists error on spleeter separate process (probably because of missing exist_ok=True parameter in https://github.com/deezer/spleeter/blob/42d476f6fa8d06f498389d1e620d2f1f59565f51/spleeter/audio/ffmpeg.py#L108)
+            foreach (var inputFilename in inputFilenames)
+            {
+                Directory.CreateDirectory(Path.Combine($"{Output_Root}/{archiveName}", inputFilename));
+            }
             var separateResult = SpliterHelper.Split(inputFileParam,  $"{Output_Root}/{archiveName}", format, includeHf, isBatch: true);
             sw.Stop();
             _logger.LogInformation($"Separation for {inputFilenames.Count} files:\n\tProcessing time: {sw.Elapsed:hh\\:mm\\:ss}");
