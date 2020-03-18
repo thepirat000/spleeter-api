@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.IO;
+using Microsoft.OpenApi.Models;
+using System.Linq;
 
 namespace SpleeterAPI
 {
@@ -45,6 +47,19 @@ namespace SpleeterAPI
 
             services.AddSingleton<Youtube.YoutubeProcessor>();
             services.AddHttpContextAccessor();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo()
+                {
+                    Version = "v1",
+                    Title = "Spleeter API",
+                    Description = "Audio separation API using Spleeter from Deezer"
+                });
+                var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).ToList();
+                xmlFiles.ForEach(xmlFile => c.IncludeXmlComments(xmlFile));
+                c.DescribeAllParametersInCamelCase();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,6 +91,12 @@ namespace SpleeterAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Spleeter API");
             });
         }
 

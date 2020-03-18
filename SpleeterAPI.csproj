@@ -11,6 +11,10 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>SpleeterAPI.xml</DocumentationFile>
+  </PropertyGroup>
+
   
   <ItemGroup>
     <Compile Remove="API\**" />
@@ -72,6 +76,7 @@
     <PackageReference Include="Audit.NET" Version="14.8.0" />
     <PackageReference Include="Audit.NET.Udp" Version="14.8.0" />
     <PackageReference Include="Audit.WebApi" Version="14.8.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
