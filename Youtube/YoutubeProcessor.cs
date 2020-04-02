@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SpleeterAPI.Split;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -35,12 +36,14 @@ namespace SpleeterAPI.Youtube
         public ProcessResponse Process(YoutubeProcessRequest request)
         {
             var mainSw = Stopwatch.StartNew();
+            var ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
             var logEntry = new YoutubeOutputLogEntry()
             {
                 StartTime = DateTime.Now,
                 Vid = request.Vid,
                 Config = $"{request.BaseFormat}{(request.Options.IncludeHighFrequencies ? "-hf" : "")}{request.Extension}",
-                IpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString(),
+                IpAddress = ip,
+                GeoLocation = GeoLocationHelper.GetGeoLocation(ip),
                 Cache = "Miss"
             };
             // 0. Check output cache

@@ -21,6 +21,7 @@ namespace SpleeterAPI.Youtube
         public int Duration { get; set; }
         public string Cache { get; set; }
         public string IpAddress { get; set; }
+        public string GeoLocation { get; set; }
 
         public override string ToString()
         {
@@ -34,6 +35,7 @@ namespace SpleeterAPI.Youtube
                 + $"{TimeToProcess}{Separator}"
                 + $"{TimeToSeparate}{Separator}"
                 + $"{IpAddress}{Separator}"
+                + $"{GeoLocation}{Separator}"
                 + $"{Errors}";
         }
 
@@ -49,6 +51,7 @@ namespace SpleeterAPI.Youtube
                 + $"TimeToProcess{Separator}"
                 + $"TimeToSeparate{Separator}"
                 + $"IpAddress{Separator}"
+                + $"GeoLocation{Separator}"
                 + $"Errors";
         }
 
