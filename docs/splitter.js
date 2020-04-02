@@ -11,28 +11,11 @@ var dzError = false;
 
 window.OnLoadCallback = () => {
     let k = getCookie("spleeter_gapikey");
-	if (k === "") {
-        $("#div-search").hide();
-        $("#extra-buttons").hide();
-		return;
-	}
     if (k) {
         gapi.client.setApiKey(k);
     } else {
-        k = prompt("Enter a valid Google API key for youtube v3 API.\n(https://console.developers.google.com)\nOr leave it blank if you don't plan to use the embedded YouTube search");
-		if (k === "") {
-			setCookie("spleeter_gapikey", "");
-		}
-        if (!k) {
-            $("#div-search").hide();
-            $("#extra-buttons").hide();
-            return;
-        }
         try {
-            let dc = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", k).toString(CryptoJS.enc.Utf8);
-            if (dc.startsWith('AIza')) {
-                k = dc;
-            }
+            k = CryptoJS.AES.decrypt("U2FsdGVkX1/YO06ep/mFGZGtIcASWlhidpcerOBsLehPAijwiWuK4mK7AFlx/VY19QAXtEvtEusr6nNGUcJ/Fg==", ("uoyk" + "cuf").split("").reverse().join("")).toString(CryptoJS.enc.Utf8);
         } finally {
             gapi.client.setApiKey(k);
             setCookie("spleeter_gapikey", k);
