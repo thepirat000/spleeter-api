@@ -14,7 +14,7 @@ namespace SpleeterAPI.Split
             try
             {
                 var ipInfo = GetIpInfo(ip).GetAwaiter().GetResult();
-                return ipInfo == null ? "" : $"{ipInfo.City}, {ipInfo.CountryName}";
+                return ipInfo == null ? "" : !string.IsNullOrEmpty(ipInfo.City) ? $"{ipInfo.City}, {ipInfo.CountryName}" : ipInfo.CountryName;
             }
             catch (Exception ex)
             {
