@@ -290,3 +290,8 @@ select {
 .text-muted {
 	background-color: lightgray;
 }
+
+#server-down-div {
+    color: orangered;
+    text-align: center;
+}

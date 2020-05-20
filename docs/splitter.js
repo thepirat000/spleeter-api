@@ -96,6 +96,8 @@ $(document).ready(function () {
 
     $("#type").change();
     $("#div-stems").show();
+
+    TestConnectivity();
 });
 
 function setInputsFromCookie() {
@@ -514,4 +516,22 @@ function originalDownloadClick(type) {
     }
     window.open(downloadUrl);
     return false;
+}
+
+function TestConnectivity() {
+    let testUrl = split_yt_api.replace("/yt", "/test");
+    $("#server-down-text").html('');
+    var opts = {
+        method: 'GET',
+        headers: {}
+    };
+    fetch(testUrl, opts)
+        .then(function (response) {
+            $("#server-down-div").toggle(!response.ok);
+        })
+        .catch(function (error) {
+            $("#server-down-div").show();
+            $("#server-down-text").html(error);
+        });
+
 }
