@@ -26,6 +26,8 @@ window.OnLoadCallback = () => {
 };
 
 $(document).ready(function () {
+    TestConnectivity();
+
     makeTabs();
     setupDropFilesBox();
 
@@ -96,8 +98,6 @@ $(document).ready(function () {
 
     $("#type").change();
     $("#div-stems").show();
-
-    TestConnectivity();
 });
 
 function setInputsFromCookie() {
@@ -525,7 +525,7 @@ function TestConnectivity() {
         method: 'GET',
         headers: {}
     };
-    fetch(testUrl, opts)
+    fetchTimeout(testUrl, opts, 4000)
         .then(function (response) {
             $("#server-down-div").toggle(!response.ok);
         })
@@ -534,4 +534,13 @@ function TestConnectivity() {
             $("#server-down-text").html(error);
         });
 
+}
+
+function fetchTimeout(url, options, timeout) {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+        )
+    ]);
 }
