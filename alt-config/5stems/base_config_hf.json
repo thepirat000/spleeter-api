@@ -8,7 +8,7 @@
     "frame_length":4096,
     "frame_step":1024,
     "T":512,
-    "F":1024,
+    "F":1536,
     "n_channels":2,
     "separation_exponent":2,
     "mask_extension":"average",
