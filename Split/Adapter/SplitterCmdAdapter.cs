@@ -135,7 +135,14 @@ namespace SpleeterAPI.Youtube
             }
             else
             {
-                formatParam = $"-p spleeter:{request.BaseFormat}";
+                if (request.Options.IncludeHighFrequencies)
+                {
+                    formatParam = $"-p spleeter:{request.BaseFormat}-16kHz";
+                }
+                else
+                {
+                    formatParam = $"-p spleeter:{request.BaseFormat}";
+                }
             }
             var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
             var separateCommand = @$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3";
