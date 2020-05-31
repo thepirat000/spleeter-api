@@ -528,6 +528,14 @@ function TestConnectivity() {
     fetchTimeout(testUrl, opts, 4000)
         .then(function (response) {
             $("#server-down-div").toggle(!response.ok);
+            return response.json();
+        })
+        .then(json => {
+            let ip = json.ClientIp;
+            let geo = json.ClientGeo;
+            if (ip && ip.length > 4) {
+                $("#client-geo").html("Your IP is: " + ip + " (" + geo + ")");
+            }
         })
         .catch(function (error) {
             $("#server-down-div").show();

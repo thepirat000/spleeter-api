@@ -295,3 +295,7 @@ select {
     color: orangered;
     text-align: center;
 }
+
+#div-client-geo {
+    font-size: small;
+}
