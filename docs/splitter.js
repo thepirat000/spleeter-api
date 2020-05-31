@@ -534,7 +534,7 @@ function TestConnectivity() {
             let ip = json.ClientIp;
             let geo = json.ClientGeo;
             if (ip && ip.length > 4) {
-                $("#client-geo").html("Your IP is: " + ip + " (" + geo + ")");
+                $("#client-geo").html("Your IP address is " + ip + " (" + geo + ")");
             }
         })
         .catch(function (error) {
