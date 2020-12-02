@@ -494,6 +494,20 @@ function presetClick(preset) {
         $("#div-stems input#toggle-vocals").prop('checked', true);
         $("input#rad-mp3").prop('checked', true);
 	}
+	else if (preset === "audio-bassless") {
+        $("#type").val("4stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', true);
+        $("#div-stems input#toggle-bass").prop('checked', false);
+        $("input#rad-mp3").prop('checked', true);
+	}
+	else if (preset === "audio-drumless") {
+        $("#type").val("4stems");
+        $("#type").change();
+        $("#div-stems input").prop('checked', true);
+        $("#div-stems input#toggle-drums").prop('checked', false);
+        $("input#rad-mp3").prop('checked', true);
+	}
 	else if (preset === "default") {
         $("#type").val("4stems");
         $("#type").change();
