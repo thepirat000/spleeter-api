@@ -112,13 +112,11 @@ function setInputsFromCookie() {
         } else {
             $("#type").val("4stems");
         }
+        let hfConfig = getCookie('spleeter_hf');
+        $("#chk-hf").prop('checked', hfConfig === 'true');
     } else {
         $("#type").val("4stems");
     }
-
-    let hfConfig = getCookie('spleeter_hf');
-
-    $("#chk-hf").prop('checked', hfConfig === undefined || hfConfig === 'true');
 
     let stemsConfig = getCookie('spleeter_stems');
     if (stemsConfig) {
