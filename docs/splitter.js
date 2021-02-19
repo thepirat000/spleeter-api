@@ -117,7 +117,8 @@ function setInputsFromCookie() {
     }
 
     let hfConfig = getCookie('spleeter_hf');
-    $("#chk-hf").prop('checked', hfConfig === 'true');
+
+    $("#chk-hf").prop('checked', hfConfig === undefined || hfConfig === 'true');
 
     let stemsConfig = getCookie('spleeter_stems');
     if (stemsConfig) {
