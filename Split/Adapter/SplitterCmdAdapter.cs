@@ -132,14 +132,15 @@ namespace SpleeterAPI.Youtube
             string formatParam;
             if (request.Options.IncludeHighFrequencies)
             {
-                formatParam = $"-p alt-config/{request.BaseFormat}/base_config_hf.json";
+                //formatParam = $"-p alt-config/{request.BaseFormat}/base_config_hf.json";
+                formatParam = $"-p spleeter:{request.BaseFormat}-16kHz";
             }
             else
             {
                 formatParam = $"-p spleeter:{request.BaseFormat}";
             }
-            var inputParam = "-i " + (isBatch ? inputFile : $"\"{inputFile}\"");
-            var separateCommand = @$"spleeter separate {inputParam} -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3";
+            var inputParam = isBatch ? inputFile : $"\"{inputFile}\"";
+            var separateCommand = @$"spleeter separate -o ""{outputFolder}"" {maxDurationParam} {formatParam} -c mp3 {inputParam}";
             using (var sw = process.StandardInput)
             {
                 if (sw.BaseStream.CanWrite)
