@@ -105,15 +105,9 @@ conda activate 'C:\tools\miniconda3';
 
 conda update -n base -c defaults conda -y
 
-if ($type -eq "gpu") {
-    Write-Host "Installing tensorflow spleeter-gpu (this can take some time)" -foregroundcolor "green";
-    conda install -c conda-forge spleeter-gpu -y
-} 
-else {
-    Write-Host "Installing spleeter-cpu (this can take some time)" -foregroundcolor "green";
-    pip install spleeter
-    #conda install -c conda-forge spleeter -y
-}
+Write-Host "Installing spleeter (this can take some time)" -foregroundcolor "green";
+pip install spleeter
+#conda install -c conda-forge spleeter -y
 
 conda deactivate 
 
