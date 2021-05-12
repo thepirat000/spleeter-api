@@ -1,7 +1,5 @@
 # spleeter-api <img src="https://app.pixelencounter.com/api/basic/monsters/random" alt="drawing" width="20"/>
 
-
-
 Audio separation API using Spleeter (CPU or GPU) from Deezer Research.
 
 > [Spleeter](https://github.com/deezer/spleeter) is A Fast And State-of-the Art Music Source Separation Tool With Pre-trained Models.
