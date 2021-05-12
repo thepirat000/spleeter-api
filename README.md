@@ -1,4 +1,5 @@
-# spleeter-api
+# spleeter-api <img src="https://app.pixelencounter.com/api/basic/monsters/random" alt="drawing" width="20"/>
+
 
 
 Audio separation API using Spleeter (CPU or GPU) from Deezer Research.
