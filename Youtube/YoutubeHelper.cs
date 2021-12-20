@@ -11,6 +11,7 @@ namespace SpleeterAPI.Youtube
     {
         private static string Youtube_User = Startup.Configuration["Youtube:User"];
         private static string Youtube_Pass = Startup.Configuration["Youtube:Pass"];
+        private static string Youtube_Dl_Tool = Startup.Configuration["Youtube:CommandTool"];
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private static string Cache_Root = Startup.Configuration["Spleeter:CacheFolder"];
         private static ConcurrentDictionary<string, YoutubeVideoInfo> _videoInfoCache = new ConcurrentDictionary<string, YoutubeVideoInfo>();
@@ -29,16 +30,16 @@ namespace SpleeterAPI.Youtube
             {
                 return cachedInfo;
             }
-            var cmd = @$"youtube-dl -s --get-filename --get-duration --no-check-certificate ""https://youtu.be/{vid}""";
+            var cmd = @$"{Youtube_Dl_Tool} -s --get-filename --get-duration --no-check-certificate ""https://youtu.be/{vid}""";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl -s exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
+                throw new Exception($"{Youtube_Dl_Tool} -s exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
-            var dataArray = shellResult.Output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var dataArray = shellResult.Output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
             if (dataArray.Length < 2)
             {
-                throw new Exception($"youtube-dl -s returned unformatted data {shellResult.ExitCode}.\n{shellResult.Output}");
+                throw new Exception($"{Youtube_Dl_Tool} -s returned unformatted data {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             var info = new YoutubeVideoInfo()
             {
@@ -76,15 +77,15 @@ namespace SpleeterAPI.Youtube
                 return result;
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}""";
-            var cmd = @$"youtube-dl -f bestaudio --no-playlist {userPassParams} -o ""{fileName}"" --no-check-certificate ""https://youtu.be/{vid}""";
+            var cmd = @$"{Youtube_Dl_Tool} -f bestaudio --no-playlist {userPassParams} -o ""{fileName}"" --no-check-certificate ""https://youtu.be/{vid}""";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
+                throw new Exception($"{Youtube_Dl_Tool} audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             if (!File.Exists(fileName))
             {
-                throw new Exception($"Video filename {fileName} not found after youtube-dl");
+                throw new Exception($"Video filename {fileName} not found after {Youtube_Dl_Tool}");
             }
             result.AudioFileFullPath = fileName;
             return result;
@@ -94,16 +95,16 @@ namespace SpleeterAPI.Youtube
         {
             var filePathTemplate = $"{Output_Root}/yt/{vid}.%(ext)s";
             
-            var cmd = $@"youtube-dl -f bestaudio --max-filesize 100M --extract-audio --audio-format mp3 --audio-quality 0 --no-check-certificate -o ""{filePathTemplate}"" ""https://youtu.be/{vid}""";
+            var cmd = $@"{Youtube_Dl_Tool} -f bestaudio --max-filesize 100M --extract-audio --audio-format mp3 --audio-quality 0 --no-check-certificate -o ""{filePathTemplate}"" ""https://youtu.be/{vid}""";
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
+                throw new Exception($"{Youtube_Dl_Tool} audio exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             var outputFilePath = $"{Output_Root}/yt/{vid}.mp3";
             if (!File.Exists(outputFilePath))
             {
-                throw new Exception($"Audio filename {outputFilePath} not found after youtube-dl");
+                throw new Exception($"Audio filename {outputFilePath} not found after {Youtube_Dl_Tool}");
             }
             return outputFilePath;
         }
@@ -119,16 +120,16 @@ namespace SpleeterAPI.Youtube
             }
             var userPassParams = string.IsNullOrWhiteSpace(Youtube_User) ? "" : @$"-u ""{Youtube_User}"" -p ""{Youtube_Pass}"" ";
             var embedSubs = includeSubtitles ? "--write-sub --embed-subs " : "";
-            var cmd = @$"youtube-dl -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 100M {userPassParams}-o ""{fileName}"" {embedSubs}--no-check-certificate ""https://youtu.be/{vid}""";
+            var cmd = @$"{Youtube_Dl_Tool} -f ""bestvideo[height<=720][ext=mp4]"" --max-filesize 100M {userPassParams}-o ""{fileName}"" {embedSubs}--no-check-certificate ""https://youtu.be/{vid}""";
 
             var shellResult = ShellHelper.Execute(cmd);
             if (shellResult.ExitCode != 0)
             {
-                throw new Exception($"youtube-dl video exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
+                throw new Exception($"{Youtube_Dl_Tool} video exited with code {shellResult.ExitCode}.\n{shellResult.Output}");
             }
             if (!File.Exists(fileName))
             {
-                throw new Exception($"Audio filename {fileName} not found after youtube-dl");
+                throw new Exception($"Audio filename {fileName} not found after {Youtube_Dl_Tool}");
             }
             result.VideoFileFullPath = fileName;
             return result;
