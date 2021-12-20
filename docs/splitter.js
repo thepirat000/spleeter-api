@@ -8,7 +8,6 @@ var max_duration_mins = 30;
 var split_yt_api = 'https://spleeter.westus.cloudapp.azure.com/yt';
 var split_mp3_api = 'https://spleeter.westus.cloudapp.azure.com/mp3';
 
-
 var selectedFiles = [];
 var dropzone;
 var dzError = false;
@@ -533,6 +532,11 @@ function originalDownloadClick(type) {
     }
     window.open(downloadUrl);
     return false;
+}
+
+function youtubePlayList() {
+    let downloadUrl = split_yt_api + "/pl";
+    window.open(downloadUrl);
 }
 
 function TestConnectivity() {

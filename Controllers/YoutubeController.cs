@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using Audit.WebApi;
 using Microsoft.AspNetCore.Cors;
@@ -24,6 +25,9 @@ namespace SpleeterAPI.Controllers
         private static int Max_Duration_Seconds = int.Parse(Startup.Configuration["Youtube:MaxDuration"]);
         private static string Output_Root = Startup.Configuration["Spleeter:OutputFolder"];
         private readonly YoutubeProcessor _processor;
+
+        private static int LatestVideosMaxSize = 1000;
+        private static List<string> _latestVideosProcessed = new List<string>();
 
         public YoutubeController(ILogger<YoutubeController> logger, YoutubeProcessor processor)
         {
@@ -63,6 +67,14 @@ namespace SpleeterAPI.Controllers
             if (result.LogEntry != null)
             {
                 Startup.FileLog(result.LogEntry.ToString());
+                if (result.LogEntry.Success)
+                {
+                    _latestVideosProcessed.Add(result.LogEntry.Vid);
+                    while (_latestVideosProcessed.Count > LatestVideosMaxSize)
+                    {
+                        _latestVideosProcessed.RemoveRange(0, _latestVideosProcessed.Count - LatestVideosMaxSize);
+                    }
+                }
             }
             return result;
         }
@@ -99,6 +111,22 @@ namespace SpleeterAPI.Controllers
                 return PhysicalFile(outputFilePath, contentType, info.Filename + ext);
             }
             return Problem($"File {outputFilename} not found");
+        }
+
+        /// <summary>
+        /// Creates a youtube playlist with the latest 50 videos processed by any user
+        /// </summary>
+        [HttpGet("pl")]
+        public ActionResult CreatePlaylist()
+        {
+            var videoIds = string.Join(",", _latestVideosProcessed.Distinct().Take(50));
+            if (videoIds.Length > 0)
+            {
+                var url = $"https://www.youtube.com/watch_videos?video_ids={videoIds}";
+                return Redirect(url);
+            }
+
+            return NoContent();
         }
 
         /// <summary>

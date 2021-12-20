@@ -14,7 +14,6 @@ namespace SpleeterAPI.Youtube
 
         public SplitProcessResult Split(string inputFile, string outputFolder, string format, bool includeHighFreq, bool isBatch = false)
         {
-            var output = new StringBuilder();
             var status = new SplitProcessResult();
             var process = new Process
             {
@@ -52,7 +51,6 @@ namespace SpleeterAPI.Youtube
             string formatParam;
             if (includeHighFreq)
             {
-                //formatParam = $"-p alt-config/{format}/base_config_hf.json";
                 formatParam = $"-p spleeter:{format}-16kHz";
             }
             else
