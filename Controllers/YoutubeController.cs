@@ -28,7 +28,12 @@ namespace SpleeterAPI.Controllers
         private readonly YoutubeProcessor _processor;
 
         private static int LatestVideosMaxSize = 1000;
-        private static List<string> _latestVideosProcessed = new List<string>();
+        private static List<string> _latestVideosProcessed;
+
+        static YoutubeController()
+        {
+            _latestVideosProcessed = YoutubeHelper.GetLatestVideoIds(50);
+        }
 
         public YoutubeController(ILogger<YoutubeController> logger, YoutubeProcessor processor)
         {

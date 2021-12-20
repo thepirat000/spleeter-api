@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SpleeterAPI.Youtube
@@ -137,6 +138,25 @@ namespace SpleeterAPI.Youtube
         {
             var fileName = GetAudioFilename(vid);
             return File.Exists(fileName);
+        }
+
+        /// <summary>
+        /// Gets a list of the latest video IDs in the cache
+        /// </summary>
+        public static List<string> GetLatestVideoIds(int count)
+        {
+            var dir = new DirectoryInfo($"{Cache_Root}/yt/split");
+            if (!dir.Exists)
+            {
+                dir.Create();
+            }
+            var vids = dir.EnumerateDirectories()
+                .OrderByDescending(d => d.LastWriteTimeUtc)
+                .Select(d => d.Name.EndsWith(".hf") ? d.Name.Substring(0, d.Name.Length - 3) : d.Name)
+                .Distinct()
+                .Take(count)
+                .ToList();
+            return vids;
         }
 
         private static string GetAudioFilename(string vid)

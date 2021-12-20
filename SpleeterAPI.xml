@@ -16,7 +16,7 @@
             <param name="vid">Youtube video ID</param>
             <param name="format">2stems, 4stems or 5stems</param>
         </member>
-        <member name="M:SpleeterAPI.Controllers.YoutubeController.CreatePlaylist(System.Boolean)">
+        <member name="M:SpleeterAPI.Controllers.YoutubeController.CreatePlaylist">
             <summary>
             Creates a youtube playlist with the latest 50 videos processed by any user
             </summary>
@@ -29,6 +29,11 @@
         <member name="M:SpleeterAPI.Controllers.YoutubeController.DirectDownloadAudio(System.String)">
             <summary>
             Direct Download audio
+            </summary>
+        </member>
+        <member name="M:SpleeterAPI.Youtube.YoutubeHelper.GetLatestVideoIds(System.Int32)">
+            <summary>
+            Gets a list of the latest video IDs in the cache
             </summary>
         </member>
         <member name="M:SpleeterAPI.Youtube.YoutubeProcessor.GetOutputFileName(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,System.Boolean)">
