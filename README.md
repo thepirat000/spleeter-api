@@ -7,12 +7,12 @@ Audio separation API using Spleeter (CPU or GPU) from Deezer Research.
 
 ### Live demo: https://thepirat000.github.io/spleeter-api/
 
+[![alt text](https://user-images.githubusercontent.com/9836380/146712887-c5f20616-f216-465e-87cb-c54390c99a55.png "Spleeter")](https://thepirat000.github.io/spleeter-api/)
+
 This tool allows to split the audio of a youtube video or any .mp3:
 
 - Enter a YouTube URL and get isolated mp3s for each part (i.e. Bass.mp3, Drums.mp3, Vocals.mp3, etc), or get an .mp4 with the original video plus the audio mix including the subtitles (if any), and more.
 - Upload your .mp3's and split
-
-[![alt text](https://miro.medium.com/max/1400/1*j1WakLQXuQkJCXlRk0xt5g.jpeg "Spleeter")](https://thepirat000.github.io/spleeter-api/)
 
 ## Install
 
