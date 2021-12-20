@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 using Audit.WebApi;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -119,7 +120,16 @@ namespace SpleeterAPI.Controllers
         [HttpGet("pl")]
         public ActionResult CreatePlaylist()
         {
-            var videoIds = string.Join(",", _latestVideosProcessed.Distinct().Take(50));
+            var hash = new HashSet<string>();
+            foreach (var vid in _latestVideosProcessed.AsEnumerable().Reverse())
+            {
+                hash.Add(vid);
+                if (hash.Count == 50)
+                {
+                    break;
+                }
+            }
+            var videoIds = string.Join(",", hash);
             if (videoIds.Length > 0)
             {
                 var url = $"https://www.youtube.com/watch_videos?video_ids={videoIds}";
