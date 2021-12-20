@@ -16,7 +16,7 @@
             <param name="vid">Youtube video ID</param>
             <param name="format">2stems, 4stems or 5stems</param>
         </member>
-        <member name="M:SpleeterAPI.Controllers.YoutubeController.CreatePlaylist">
+        <member name="M:SpleeterAPI.Controllers.YoutubeController.CreatePlaylist(System.Boolean)">
             <summary>
             Creates a youtube playlist with the latest 50 videos processed by any user
             </summary>

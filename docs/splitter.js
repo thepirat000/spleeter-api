@@ -537,6 +537,7 @@ function originalDownloadClick(type) {
 function youtubePlayList() {
     let downloadUrl = split_yt_api + "/pl";
     window.open(downloadUrl);
+    return false;
 }
 
 function TestConnectivity() {
