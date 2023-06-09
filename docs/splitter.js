@@ -2,11 +2,9 @@ var buttonSplit = $("#btn-split");
 
 var max_duration_mins = 30;
 
-//var split_yt_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/yt';
-//var split_mp3_api = 'https://spleeter-gpu2.eastus.cloudapp.azure.com/mp3';
-
-var split_yt_api = 'https://spleeter-cpu.eastus.cloudapp.azure.com/yt';
-var split_mp3_api = 'https://spleeter-cpu.eastus.cloudapp.azure.com/mp3';
+var split_yt_api = 'https://localhost:5001/yt';
+var split_test_api = 'https://localhost:5001/test';
+var split_mp3_api = 'https://localhost:5001/mp3';
 
 var selectedFiles = [];
 var dropzone;
@@ -541,13 +539,12 @@ function youtubePlayList() {
 }
 
 function TestConnectivity() {
-    let testUrl = split_yt_api.replace("/yt", "/test");
     $("#server-down-text").html('');
     var opts = {
         method: 'GET',
         headers: {}
     };
-    fetchTimeout(testUrl, opts, 4000)
+    fetchTimeout(split_test_api, opts, 4000)
         .then(function (response) {
             $("#server-down-div").toggle(!response.ok);
             return response.json();

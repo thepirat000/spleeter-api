@@ -1,12 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>770f53e5-6b9c-4a58-b73c-528f7f74dc1d</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <DockerfileContext>.</DockerfileContext>
-    <DockerfileRunArguments>-v "C:/spleeter/input:/input" -v "C:/spleeter/output:/output" -v "C:/Spleeter/model":/model -e MODEL_PATH=/model</DockerfileRunArguments>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
