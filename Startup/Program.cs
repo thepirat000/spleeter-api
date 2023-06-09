@@ -17,6 +17,7 @@ namespace SpleeterAPI
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseKestrel();
                     webBuilder.UseStartup<Startup>();
                 })
                 .ConfigureAppConfiguration((hostingContext, config) =>
