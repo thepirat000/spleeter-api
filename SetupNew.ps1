@@ -65,6 +65,8 @@ mkdir "c:\spleeter\cache"
 refreshenv
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
+Write-Host "Installation complete..."
+
 #git clone
 mkdir "c:\git"
 cd "c:\git"
@@ -76,10 +78,7 @@ git clone -q https://github.com/thepirat000/spleeter-api
 cd spleeter-api
 dotnet build SpleeterAPI.sln -c Release
 dotnet publish SpleeterAPI.csproj -c Release
+
 cd bin\Release\net7.0\publish
-
-
-Write-Host "Installation complete..."
-
-
+dotnet SpleeterAPI.dll --launch-profile https --urls "http://*:80;https://*:443"
 
