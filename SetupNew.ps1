@@ -75,7 +75,8 @@ git clone -q https://github.com/deezer/spleeter
 git clone -q https://github.com/thepirat000/spleeter-api
 
 #build and publish spleeter-api
-cd spleeter-api
+cd "c:\git\spleeter-api"
+git pull
 dotnet build SpleeterAPI.sln -c Release
 dotnet publish SpleeterAPI.csproj -c Release
 
