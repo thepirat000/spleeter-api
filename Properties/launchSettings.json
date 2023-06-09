@@ -27,6 +27,14 @@
       "applicationUrl": "https://localhost:7280;http://localhost:5240",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "Certificates": {
+        "Default": {
+          "Subject": "spl.eastus.cloudapp.azure.com",
+          "Store": "Root",
+          "Location": "LocalMachine",
+          "AllowInvalid": true
+        }
       }
     },
     "IIS Express": {
