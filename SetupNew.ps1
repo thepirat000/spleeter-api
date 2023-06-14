@@ -6,6 +6,42 @@ Checkpoint-Computer -Description 'Before spleeter'
 # Install chocolatey
 iex ($down.DownloadString('https://chocolatey.org/install.ps1'));
 
+# Install IIS
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpErrors
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpRedirect
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationDevelopment
+Enable-WindowsOptionalFeature -online -norestart -FeatureName NetFx4Extended-ASPNET45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-NetFxExtensibility45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HealthAndDiagnostics
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpLogging
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-LoggingLibraries
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestMonitor
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpTracing
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Security
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-RequestFiltering
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Performance
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerManagementTools
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-IIS6ManagementCompatibility
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-Metabase
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementConsole
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-BasicAuthentication
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WindowsAuthentication
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-StaticContent
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-DefaultDocument
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebSockets
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ApplicationInit
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIExtensions
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ISAPIFilter
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-HttpCompressionStatic
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ASPNET45
+Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-ManagementService
+net start WMSvc
+choco install webdeploy -y --no-progress
+choco install urlrewrite -y --no-progress
+
 # Download dotnet hosting bundle
 Write-Host "Download dotnet core runtime & hosting bundle", $PSScriptRoot -foregroundcolor "green";
 $url = 'https://download.visualstudio.microsoft.com/download/pr/19927e80-7df2-4906-badd-439502008177/cb55d49c06a3691965b4bcf934ead822/dotnet-hosting-7.0.5-win.exe';
@@ -21,7 +57,6 @@ $url  = 'https://download.visualstudio.microsoft.com/download/pr/974313ac-3d89-4
 $file = $PSScriptRoot + '\dotnet-sdk-7.0.302-win-x64.exe';
 $down.DownloadFile($url,$file);
 & $file /install /passive
-
 
 #GIT
 Write-Host "Installing GIT" -foregroundcolor "green";
