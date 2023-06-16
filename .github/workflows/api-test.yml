@@ -1,6 +1,7 @@
 name: Spleeter API test
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 * * * *'
 
