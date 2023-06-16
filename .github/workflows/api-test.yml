@@ -1,0 +1,19 @@
+name: Spleeter API test
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  HealthCheck:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check the deployed service URL
+      uses: jtalk/url-health-check-action@v3
+      with:
+        url: https://spl.eastus.cloudapp.azure.com/test
+        follow-redirect: false
+        max-attempts: 2
+
