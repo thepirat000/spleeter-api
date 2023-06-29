@@ -3,7 +3,7 @@ name: Spleeter API test
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 */12 * * *'
 
 jobs:
   HealthCheck:
