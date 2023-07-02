@@ -7,7 +7,6 @@ Audio separation API using Spleeter (CPU or GPU) from Deezer Research.
 
 ### Live demo: https://thepirat000.github.io/spleeter-api/
 
-NOTE: Live demo is working again !
 
 [![alt text](https://user-images.githubusercontent.com/9836380/146712887-c5f20616-f216-465e-87cb-c54390c99a55.png "Spleeter")](https://thepirat000.github.io/spleeter-api/)
 
