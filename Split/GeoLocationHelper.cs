@@ -29,8 +29,8 @@ namespace SpleeterAPI.Split
 
         public static async Task<IpInfo> GetIpInfo(string ip)
         {
-            IpInfo info;
-            if (!_ipInfoCache.TryGetValue(ip, out info))
+            IpInfo info = null;
+            if (ip.Length > 5 && !_ipInfoCache.TryGetValue(ip, out info))
             {
                 info = await _client.Lookup(ip);
                 _ipInfoCache.TryAdd(ip, info);

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>770f53e5-6b9c-4a58-b73c-528f7f74dc1d</UserSecretsId>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
@@ -68,13 +68,13 @@
 
   <ItemGroup>
     <PackageReference Include="IpData" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="Audit.NET" Version="14.8.0" />
-    <PackageReference Include="Audit.NET.Udp" Version="14.8.0" />
-    <PackageReference Include="Audit.WebApi" Version="14.8.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="Audit.NET" Version="27.1.1" />
+    <PackageReference Include="Audit.NET.Udp" Version="27.1.1" />
+    <PackageReference Include="Audit.WebApi.Core" Version="27.1.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
   <ItemGroup>

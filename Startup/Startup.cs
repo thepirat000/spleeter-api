@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Microsoft.OpenApi.Models;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace SpleeterAPI
 {
@@ -41,7 +42,7 @@ namespace SpleeterAPI
 
             services.AddControllers()
                 .AddJsonOptions(json => {
-                    json.JsonSerializerOptions.IgnoreNullValues = true;
+                    json.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     json.JsonSerializerOptions.WriteIndented = true;
                 });
 
@@ -142,10 +143,11 @@ namespace SpleeterAPI
             }
 
             Console.WriteLine(text);
-            Audit.Core.AuditScope.CreateAndSave("Ephemeral", new { Status = text });
+            Audit.Core.AuditScope.Log("Ephemeral", new { Status = text });
         }
 
-        private static object _fleLogLocker = new object();
+        private static readonly object _fleLogLocker = new object();
+
         public static void FileLog(string text, bool noAppend = false)
         {
             var logFile = GetFileLogPath();

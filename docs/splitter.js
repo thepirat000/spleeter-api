@@ -2,9 +2,9 @@ var buttonSplit = $("#btn-split");
 
 var max_duration_mins = 30;
 
-var split_yt_api = 'https://spl.eastus.cloudapp.azure.com/yt';
-var split_test_api = 'https://spl.eastus.cloudapp.azure.com/test';
-var split_mp3_api = 'https://spl.eastus.cloudapp.azure.com/mp3';
+var split_yt_api = 'https://localhost:7280/yt';
+var split_test_api = 'https://localhost:7280/test';
+var split_mp3_api = 'https://localhost:7280/mp3';
 
 var selectedFiles = [];
 var dropzone;
