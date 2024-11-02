@@ -12,60 +12,13 @@
     <DocumentationFile>SpleeterAPI.xml</DocumentationFile>
   </PropertyGroup>
 
+	<ItemGroup>
+		<Content Include="Docs\*.*">
+			<Link>wwwroot\%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
   
-  <ItemGroup>
-    <Compile Remove="API\**" />
-    <Compile Remove="conda\**" />
-    <Compile Remove="configs\**" />
-    <Compile Remove="docker\**" />
-    <Compile Remove="Documents\**" />
-    <Compile Remove="images\**" />
-    <Compile Remove="nginx\**" />
-    <Compile Remove="pretrained_models\**" />
-    <Compile Remove="spleeter\**" />
-    <Content Remove="API\**" />
-    <Content Remove="conda\**" />
-    <Content Remove="configs\**" />
-    <Content Remove="docker\**" />
-    <Content Remove="Documents\**" />
-    <Content Remove="images\**" />
-    <Content Remove="nginx\**" />
-    <Content Remove="pretrained_models\**" />
-    <Content Remove="spleeter\**" />
-    <EmbeddedResource Remove="API\**" />
-    <EmbeddedResource Remove="conda\**" />
-    <EmbeddedResource Remove="configs\**" />
-    <EmbeddedResource Remove="docker\**" />
-    <EmbeddedResource Remove="Documents\**" />
-    <EmbeddedResource Remove="images\**" />
-    <EmbeddedResource Remove="nginx\**" />
-    <EmbeddedResource Remove="pretrained_models\**" />
-    <EmbeddedResource Remove="spleeter\**" />
-    <None Remove="API\**" />
-    <None Remove="conda\**" />
-    <None Remove="configs\**" />
-    <None Remove="docker\**" />
-    <None Remove="Documents\**" />
-    <None Remove="images\**" />
-    <None Remove="nginx\**" />
-    <None Remove="pretrained_models\**" />
-    <None Remove="spleeter\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="audio_example.mp3" />
-    <None Remove="build.cmd" />
-    <None Remove="LICENSE" />
-    <None Remove="Makefile" />
-    <None Remove="MANIFEST.in" />
-    <None Remove="push.cmd" />
-    <None Remove="README.md" />
-    <None Remove="run.cmd" />
-    <None Remove="setup.py" />
-    <None Remove="spleeter.ipynb" />
-    <None Remove="up.cmd" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="IpData" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
@@ -75,33 +28,6 @@
     <PackageReference Include="Audit.NET.Udp" Version="27.1.1" />
     <PackageReference Include="Audit.WebApi.Core" Version="27.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="alt-config\2stems\base_config_hf.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\down-arrow.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\down-arrow.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\favicon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\splitter.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\splitter.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\WaveIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
