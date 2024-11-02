@@ -44,8 +44,8 @@ choco install urlrewrite -y --no-progress
 
 # Download dotnet hosting bundle
 Write-Host "Download dotnet core runtime & hosting bundle", $PSScriptRoot -foregroundcolor "green";
-$url = 'https://download.visualstudio.microsoft.com/download/pr/19927e80-7df2-4906-badd-439502008177/cb55d49c06a3691965b4bcf934ead822/dotnet-hosting-7.0.5-win.exe';
-$file = $PSScriptRoot + '\dotnet-hosting-7.0.5-win.exe';
+$url = 'https://download.visualstudio.microsoft.com/download/pr/dfbcd81d-e383-4c92-a174-5079bde0a180/b05bcf7656d1ea900bd23c4f1939a642/dotnet-hosting-8.0.10-win.exe';
+$file = $PSScriptRoot + '\dotnet-hosting-8.0.10-win.exe';
 $down.DownloadFile($url,$file);
 # Install dotnet core runtime & hosting bundle
 Write-Host "Install dotnet core runtime & hosting bundle", $file -foregroundcolor "green";
@@ -53,8 +53,8 @@ Write-Host "Install dotnet core runtime & hosting bundle", $file -foregroundcolo
 
 # Install dotnet core SDK
 Write-Host "Install dotnet core SDK", $PSScriptRoot -foregroundcolor "green";
-$url  = 'https://download.visualstudio.microsoft.com/download/pr/974313ac-3d89-4c51-a6e8-338d864cf907/6ed5d4933878cada1b194dd1084a7e12/dotnet-sdk-7.0.302-win-x64.exe';
-$file = $PSScriptRoot + '\dotnet-sdk-7.0.302-win-x64.exe';
+$url  = 'https://download.visualstudio.microsoft.com/download/pr/6224f00f-08da-4e7f-85b1-00d42c2bb3d3/b775de636b91e023574a0bbc291f705a/dotnet-sdk-8.0.403-win-x64.exe';
+$file = $PSScriptRoot + '\dotnet-sdk-8.0.403-win-x64.exe';
 $down.DownloadFile($url,$file);
 & $file /install /passive
 
@@ -83,7 +83,10 @@ conda activate 'C:\tools\miniconda3';
 
 conda update -n base -c defaults conda -y
 
+conda install -c conda-forge ffmpeg libsndfile
+
 Write-Host "Installing spleeter (this can take some time)" -foregroundcolor "green";
+pip install numpy==1.26.4
 pip install spleeter
 
 conda deactivate 
@@ -115,6 +118,6 @@ git pull
 dotnet build SpleeterAPI.sln -c Release
 dotnet publish SpleeterAPI.csproj -c Release
 
-cd bin\Release\net7.0\publish
+cd bin\Release\net8.0\publish
 dotnet SpleeterAPI.dll --launch-profile https --urls "http://*:80;https://*:443"
 
