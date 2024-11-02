@@ -2,9 +2,9 @@ var buttonSplit = $("#btn-split");
 
 var max_duration_mins = 30;
 
-var split_yt_api = 'https://MAC-1/yt';
-var split_test_api = 'https://MAC-1/test';
-var split_mp3_api = 'https://MAC-1/mp3';
+var split_yt_api = '/yt';
+var split_test_api = '/test';
+var split_mp3_api = '/mp3';
 
 var selectedFiles = [];
 var dropzone;
