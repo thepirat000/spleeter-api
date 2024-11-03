@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.OpenApi.Models;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 
 namespace SpleeterAPI
 {
@@ -89,8 +90,17 @@ namespace SpleeterAPI
 
             app.UseAuthorization();
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            var fileProvider = new PhysicalFileProvider(Path.Combine(Environment.ContentRootPath, "Docs"));
+
+            app.UseDefaultFiles(new DefaultFilesOptions()
+            {
+                FileProvider = fileProvider
+            });
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = fileProvider
+            });
 
             app.UseEndpoints(endpoints =>
             {
