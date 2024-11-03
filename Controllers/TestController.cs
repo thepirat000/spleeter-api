@@ -28,6 +28,7 @@ namespace SpleeterAPI.Controllers
         public string Get()
         {
             var ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            ip = ip.Replace("::ffff:", "");
             var geo = GeoLocationHelper.GetGeoLocation(ip);
             var moduleFile = Process.GetCurrentProcess().MainModule.FileName;
             var lastModified = System.IO.File.GetLastWriteTime(moduleFile);
