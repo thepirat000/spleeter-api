@@ -1,10 +1,19 @@
+function getApiBaseUrl() {
+    return document.URL.startsWith("https://thepirat000.github.io") ? "https://thepirat.ddns.net" : "";
+}
+
 var buttonSplit = $("#btn-split");
 
 var max_duration_mins = 30;
 
-var split_yt_api = '/yt';
-var split_test_api = '/test';
-var split_mp3_api = '/mp3';
+var split_yt_api = getApiBaseUrl() + '/yt';
+var split_test_api = getApiBaseUrl() + '/test';
+var split_mp3_api = getApiBaseUrl() + '/mp3';
+
+//var split_yt_api = '/yt';
+//var split_test_api = '/test';
+//var split_mp3_api = '/mp3';
+
 
 var selectedFiles = [];
 var dropzone;
