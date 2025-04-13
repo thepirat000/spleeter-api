@@ -6,7 +6,7 @@ Checkpoint-Computer -Description 'Before spleeter'
 # Install chocolatey
 iex ($down.DownloadString('https://chocolatey.org/install.ps1'));
 
-# Install IIS
+# Install IIS (OPTIONAL)
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServerRole
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-WebServer
 Enable-WindowsOptionalFeature -Online -norestart -FeatureName IIS-CommonHttpFeatures
@@ -86,8 +86,8 @@ conda update -n base -c defaults conda -y
 conda install -c conda-forge ffmpeg libsndfile
 
 Write-Host "Installing spleeter (this can take some time)" -foregroundcolor "green";
-pip install numpy==1.26.4
-pip install spleeter
+pip install --no-input numpy==1.26.4
+pip install --no-input spleeter
 
 conda deactivate 
 
