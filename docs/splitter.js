@@ -1,5 +1,5 @@
 function getApiBaseUrl() {
-    return document.URL.startsWith("https://thepirat000.github.io") ? "https://thepirat.ddns.net" : "";
+    return document.URL.startsWith("https://thepirat000.github.io") ? "https://spleeter-api.canadacentral.cloudapp.azure.com" : "";
 }
 
 var buttonSplit = $("#btn-split");
